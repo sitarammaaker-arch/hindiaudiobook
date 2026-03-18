@@ -125,6 +125,19 @@ export default function AudioPlayer({
       setIsPlaying(true);
       if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
 
+      // ── Track play count — fires once per session per book ───────────────
+      if (slug) {
+        const trackKey = `played_${slug}`;
+        if (!sessionStorage.getItem(trackKey)) {
+          sessionStorage.setItem(trackKey, "1");
+          fetch("/api/track-play", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slug }),
+          }).catch(() => {}); // Silent fail — non-critical
+        }
+      }
+
       // ── Save position every 5 seconds while playing ──────────────────
       saveTimerRef.current = setInterval(() => {
         savePosition(storageKey, audio.currentTime);

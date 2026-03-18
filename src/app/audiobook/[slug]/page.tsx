@@ -7,6 +7,7 @@ import AudiobookCard from "@/components/AudiobookCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import GoogleAd from "@/components/GoogleAd";
 import StarRating from "@/components/StarRating";
+import YouTubePlayTracker from "@/components/YouTubePlayTracker";
 import {
   audiobooks,
   getAudiobookBySlug,
@@ -111,6 +112,8 @@ export default function AudiobookDetailPage({ params }: Props) {
             <AudioPlayer audioUrl={book.audioUrl} title={book.title} author={book.author} thumbnail={book.thumbnail} duration={book.duration} slug={book.slug} />
           ) : (
             <div>
+              {/* YouTube play tracker — 5 sec par count hoga */}
+              <YouTubePlayTracker slug={book.slug} />
               <div className="rounded-2xl overflow-hidden shadow-xl bg-black aspect-video">
                 <iframe
                   src={`https://www.youtube.com/embed/${book.videoId}?rel=0&modestbranding=1`}

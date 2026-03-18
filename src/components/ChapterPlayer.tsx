@@ -110,6 +110,20 @@ export default function ChapterPlayer({
     const onPlay = () => {
       setIsPlaying(true);
       if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+
+      // ── Track play count — fires once per session per chapter ────────────
+      const trackSlug = book?.slug || chapter?.id;
+      if (trackSlug) {
+        const trackKey = `played_chapter_${trackSlug}_${chapter?.id}`;
+        if (!sessionStorage.getItem(trackKey)) {
+          sessionStorage.setItem(trackKey, "1");
+          fetch("/api/track-play", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slug: book?.slug }),
+          }).catch(() => {});
+        }
+      }
       saveTimerRef.current = setInterval(() => {
         savePosition(storageKey, audio.currentTime);
       }, 5000);

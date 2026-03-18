@@ -727,6 +727,10 @@ export default function UploadPage() {
                             <p className="text-gray-500 text-xs">{book.author} · {book.category} · {book.duration}</p>
                           </div>
                           <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+                              style={{ background: "#FFF1EB", color: "#E85A1A" }}>
+                              👁 {(book.plays / 1000).toFixed(1)}K
+                            </span>
                             {book.audioUrl && <span className="bg-green-100 text-green-600 text-xs font-bold px-2 py-0.5 rounded-full">🔒MP3</span>}
                             {book.trending && <span className="bg-orange-100 text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">🔥</span>}
                             <button onClick={() => deleteAudiobook(book.id, book.title)} className="w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg flex items-center justify-center">
