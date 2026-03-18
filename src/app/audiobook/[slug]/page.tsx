@@ -92,15 +92,15 @@ export default function AudiobookDetailPage({ params }: Props) {
       <Script id="audio-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(audioJsonLd) }} />
       <Script id="breadcrumb-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      {/* Breadcrumb — visible + SEO */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8" aria-label="Breadcrumb">
-        <Link href="/" className="hover:text-[#FF6B2B] transition-colors">Home</Link>
-        <span>/</span>
-        <Link href={`/category/${book.category}`} className="hover:text-[#FF6B2B] transition-colors capitalize">
-          {category?.emoji} {category?.label} Audiobooks
+      {/* Breadcrumb — mobile optimized */}
+      <nav className="flex items-center gap-1.5 text-sm text-gray-500 mb-8 flex-wrap" aria-label="Breadcrumb">
+        <Link href="/" className="hover:text-[#FF6B2B] transition-colors flex-shrink-0">Home</Link>
+        <span className="flex-shrink-0">/</span>
+        <Link href={`/category/${book.category}`} className="hover:text-[#FF6B2B] transition-colors flex-shrink-0">
+          {category?.emoji} <span className="hidden sm:inline">{category?.label}</span><span className="sm:hidden">{category?.label?.split(" ")[0]}</span>
         </Link>
-        <span>/</span>
-        <span className="text-gray-900 font-medium line-clamp-1">{book.title}</span>
+        <span className="flex-shrink-0">/</span>
+        <span className="text-gray-900 font-medium line-clamp-1 min-w-0 truncate">{book.title}</span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -120,6 +120,9 @@ export default function AudiobookDetailPage({ params }: Props) {
                   className="w-full h-full"
                 />
               </div>
+            </div>
+            {/* Warning sirf development mein dikhao — production visitors ko nahi */}
+            {process.env.NODE_ENV === "development" && (
               <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-3">
                 <span className="text-amber-500 text-lg flex-shrink-0">⚠️</span>
                 <div>
@@ -127,7 +130,15 @@ export default function AudiobookDetailPage({ params }: Props) {
                   <p className="text-amber-600 text-xs mt-0.5">Lock screen play ke liye <code className="bg-amber-100 px-1 rounded">audioUrl</code> mein MP3 link add karein.</p>
                 </div>
               </div>
-            </div>
+            )}
+            {/* Production mein: soft info badge — non-intrusive */}
+            {process.env.NODE_ENV !== "development" && (
+              <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl text-xs"
+                style={{ background: "#FFF8F5", color: "#9CA3AF", fontFamily: "var(--font-inter)" }}>
+                <span>💡</span>
+                <span>Screen lock ke baad sunne ke liye <strong style={{ color: "#FF6B2B" }}>🔒 Lock Screen ✅</strong> badge wali books chunein</span>
+              </div>
+            )}
           )}
 
           {/* Title + badges */}
