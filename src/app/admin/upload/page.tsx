@@ -691,7 +691,88 @@ export default function UploadPage() {
                 <p className="text-gray-500 text-sm">Load ho raha hai...</p>
               </div>
             ) : (
-              <>
+                {/* ── PERMANENT FIX PANEL ── */}
+                <div className="rounded-2xl overflow-hidden border-2"
+                  style={{ borderColor: "#FF6B2B", background: "#FFF8F5" }}>
+                  <div className="px-5 py-4 flex items-start gap-3"
+                    style={{ background: "#FFF1EB", borderBottom: "1px solid rgba(255,107,43,0.2)" }}>
+                    <span className="text-2xl flex-shrink-0">⚠️</span>
+                    <div>
+                      <p className="font-bold text-sm" style={{ color: "#1A1A2E" }}>
+                        Uploaded books git push ke baad lost ho jaati hain!
+                      </p>
+                      <p className="text-xs mt-1" style={{ color: "#E85A1A", lineHeight: "1.6" }}>
+                        Vercel redeploy hone par /tmp reset ho jaata hai. Permanent save ke liye neeche ka code copy karke
+                        <strong> src/data/audiobooks.ts</strong> mein paste karein, phir git push karein.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="font-semibold text-sm" style={{ color: "#1A1A2E" }}>
+                        📋 Step 1 — Yeh code copy karein
+                      </p>
+                      <button
+                        onClick={() => {
+                          if (audiobooks.length === 0) return;
+                          let maxId = 21; // current last static ID
+                          const code = audiobooks.map((book, i) => {
+                            maxId++;
+                            const desc = (book.description || "").replace(/`/g, "'");
+                            return `  {\n    id: ${maxId},\n    title: "${book.title}",\n    slug: "${book.slug}",\n    videoId: "${book.videoId}",\n    thumbnail: "https://img.youtube.com/vi/${book.videoId}/hqdefault.jpg",\n    duration: "${book.duration || "Unknown"}",\n    category: "${book.category}",\n    author: "${book.author}",\n    plays: 0,\n    trending: ${book.trending},\n    latest: ${book.latest},\n    audioUrl: "${book.audioUrl || ""}",\n    description: \`${desc}\`,\n  },`;
+                          }).join("\n\n");
+                          const fullCode = `// ── ADD KAREIN audiobooks.ts mein — last book ke baad ──\n${code}`;
+                          navigator.clipboard.writeText(fullCode).then(() => {
+                            alert("✅ Code copy ho gaya! Ab audiobooks.ts mein paste karein.");
+                          }).catch(() => {
+                            // Fallback — show in textarea
+                            const ta = document.getElementById("export-code") as HTMLTextAreaElement;
+                            if (ta) { ta.value = fullCode; ta.select(); }
+                          });
+                        }}
+                        disabled={audiobooks.length === 0}
+                        className="text-xs font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
+                        style={{ background: "#FF6B2B", color: "white", fontFamily: "var(--font-inter)" }}>
+                        📋 Code Copy Karein
+                      </button>
+                    </div>
+
+                    {audiobooks.length === 0 ? (
+                      <p className="text-xs text-center py-4" style={{ color: "#9CA3AF" }}>
+                        Koi uploaded book nahi hai — "Audiobook" tab se pehle add karein
+                      </p>
+                    ) : (
+                      <textarea id="export-code" readOnly rows={8}
+                        className="w-full rounded-xl border text-xs font-mono p-3 resize-none"
+                        style={{
+                          background: "#1A1A2E", color: "#FF9A5C",
+                          borderColor: "rgba(255,107,43,0.3)",
+                          fontFamily: "monospace", lineHeight: "1.6",
+                        }}
+                        value={audiobooks.map((book, i) => {
+                          const desc = (book.description || "").replace(/`/g, "'").substring(0, 100) + "...";
+                          return `  {\n    id: ${22 + i}, title: "${book.title}", slug: "${book.slug}",\n    videoId: "${book.videoId}", category: "${book.category}", author: "${book.author}",\n    trending: ${book.trending}, latest: ${book.latest}, audioUrl: "${book.audioUrl || ""}",\n    description: \`${desc}\`,\n  },`;
+                        }).join("\n")}
+                        onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+                      />
+                    )}
+
+                    <div className="mt-4 space-y-2">
+                      <p className="font-semibold text-sm" style={{ color: "#1A1A2E" }}>
+                        📁 Step 2 — audiobooks.ts mein paste karein
+                      </p>
+                      <div className="rounded-xl p-3 font-mono text-xs"
+                        style={{ background: "#1A1A2E", color: "#98C379", lineHeight: "1.8" }}>
+                        <span style={{ color: "#5C6370" }}>// VS Code mein yeh file kholein:</span><br />
+                        <span style={{ color: "#FF9A5C" }}>src/data/audiobooks.ts</span><br />
+                        <span style={{ color: "#5C6370" }}>// Last book ke closing brace {"}"} ke baad paste karein</span><br />
+                        <span style={{ color: "#5C6370" }}>// Phir:</span><br />
+                        <span style={{ color: "#61AFEF" }}>git add . && git commit -m "Add: new audiobooks" && git push</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4">
                   {[
