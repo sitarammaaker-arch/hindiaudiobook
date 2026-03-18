@@ -17,7 +17,7 @@ type FormData = {
 const emptyForm: FormData = {
   title: "",
   author: "",
-  category: "motivational",
+  category: "self-help",
   duration: "",
   videoId: "",
   audioUrl: "",

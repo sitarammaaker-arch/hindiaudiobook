@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { authors } from "@/data/authors";
-import { audiobooks } from "@/data/audiobooks";
+import { authors, makeAuthorSlug } from "@/data/authors";
+import { getAllAudiobooks } from "@/lib/data";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Hindi Audiobook Authors — Sabhi Lekhak | HindiAudiobook.com",
@@ -9,7 +11,56 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.hindiaudiobook.com/authors" },
 };
 
-export default function AuthorsPage() {
+const normalizeName = (name: string) => name.trim().replace(/\s+/g, " ").toLowerCase();
+
+type AuthorCard = {
+  slug: string;
+  name: string;
+  nationality: string;
+  shortBio: string;
+  genre: string[];
+  bookCount: number;
+};
+
+export default async function AuthorsPage() {
+  const allBooks = await getAllAudiobooks();
+  const staticByName = new Map(authors.map((a) => [normalizeName(a.name), a]));
+  const dynamicCounts = new Map<string, { name: string; count: number }>();
+
+  for (const book of allBooks) {
+    const name = book.author?.trim();
+    if (!name) continue;
+    const key = normalizeName(name);
+    const current = dynamicCounts.get(key);
+    dynamicCounts.set(key, { name, count: (current?.count ?? 0) + 1 });
+  }
+
+  const staticCards: AuthorCard[] = authors.map((author) => {
+    const bySlugLinks = allBooks.filter((b) => author.books.includes(b.slug)).length;
+    const byName = dynamicCounts.get(normalizeName(author.name))?.count ?? 0;
+    return {
+      slug: author.slug,
+      name: author.name,
+      nationality: author.nationality,
+      shortBio: author.shortBio,
+      genre: author.genre,
+      bookCount: Math.max(bySlugLinks, byName),
+    };
+  });
+
+  const dynamicOnlyCards: AuthorCard[] = [...dynamicCounts.entries()]
+    .filter(([normalized]) => !staticByName.has(normalized))
+    .map(([, value]) => ({
+      slug: makeAuthorSlug(value.name),
+      name: value.name,
+      nationality: "Author",
+      shortBio: `${value.name} ki uploaded Hindi audiobooks sunne ke liye profile dekhein.`,
+      genre: ["Audiobooks"],
+      bookCount: value.count,
+    }));
+
+  const authorCards = [...staticCards, ...dynamicOnlyCards]
+    .sort((a, b) => b.bookCount - a.bookCount || a.name.localeCompare(b.name));
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
@@ -24,8 +75,7 @@ export default function AuthorsPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {authors.map((author) => {
-          const bookCount = audiobooks.filter((b) => author.books.includes(b.slug)).length;
+        {authorCards.map((author) => {
           const initials = author.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
           return (
             <Link key={author.slug} href={`/author/${author.slug}`}
@@ -42,7 +92,7 @@ export default function AuthorsPage() {
                     <span key={g} className="bg-[#FFF1EB] text-[#FF6B2B] text-xs px-2 py-0.5 rounded-full">{g}</span>
                   ))}
                   <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">
-                    {bookCount} book{bookCount !== 1 ? "s" : ""}
+                    {author.bookCount} book{author.bookCount !== 1 ? "s" : ""}
                   </span>
                 </div>
               </div>
