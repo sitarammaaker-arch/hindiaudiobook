@@ -55,7 +55,10 @@ export default async function HomePage() {
   const allBooks     = await getAllAudiobooks();
   const chapterBooks = await getAllChapterBooks();
 
-  const trending = allBooks.filter((b) => b.trending);
+  // Auto-trending: highest play count books first
+  const trending = [...allBooks]
+    .sort((a, b) => (b.plays || 0) - (a.plays || 0))
+    .slice(0, 6);
   const latest   = allBooks.filter((b) => b.latest).slice(0, 6);
 
   // getTotalFreeChapters helper
@@ -144,9 +147,9 @@ export default async function HomePage() {
 
         {/* ── Trending ── */}
         <section aria-label="Trending Hindi Audiobooks">
-          <SectionHeader title="🔥 Trending Hindi Audiobooks" subtitle="Sabse zyada sune jaane wale hindi audio books" />
+          <SectionHeader title="🔥 Trending Hindi Audiobooks" subtitle="Play count ke basis par auto-updated top books" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trending.slice(0, 6).map((book) => (
+            {trending.map((book) => (
               <AudiobookCard key={book.id} audiobook={book} />
             ))}
           </div>
