@@ -8,21 +8,38 @@ import AudioPlayer from "@/components/AudioPlayer";
 import GoogleAd from "@/components/GoogleAd";
 import StarRating from "@/components/StarRating";
 import YouTubePlayTracker from "@/components/YouTubePlayTracker";
+import { getAllAudiobooks } from "@/lib/data";
 import {
   audiobooks,
   getAudiobookBySlug,
   getRelatedAudiobooks,
   categories,
+  type Audiobook,
 } from "@/data/audiobooks";
+
+// ── force-dynamic: uploaded books (KV) ke liye har request par fresh render ──
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface Props { params: { slug: string } }
 
+// generateStaticParams: sirf static books ke liye — uploaded books dynamic hongi
 export async function generateStaticParams() {
   return audiobooks.map((a) => ({ slug: a.slug }));
 }
 
+// Helper — static + KV dono se book dhundho
+async function findBook(slug: string): Promise<Audiobook | undefined> {
+  // Static mein pehle check karo (fast)
+  const staticBook = getAudiobookBySlug(slug);
+  if (staticBook) return staticBook;
+  // KV uploaded books mein dhundho
+  const allBooks = await getAllAudiobooks();
+  return allBooks.find((b) => b.slug === slug);
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const book = getAudiobookBySlug(params.slug);
+  const book = await findBook(params.slug);
   if (!book) return {};
   const cat = categories.find((c) => c.slug === book.category);
   // Title formula: [Book Name] Hindi Audiobook — [Category] | HindiAudiobook.com
@@ -45,13 +62,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function AudiobookDetailPage({ params }: Props) {
-  const book = getAudiobookBySlug(params.slug);
+export default async function AudiobookDetailPage({ params }: Props) {
+  const book = await findBook(params.slug);
   if (!book) notFound();
 
-  const related = getRelatedAudiobooks(book.slug, book.category);
-  const category = categories.find((c) => c.slug === book.category);
-  const hasDirectAudio = Boolean(book.audioUrl && book.audioUrl.trim() !== "");
+  const allBooks    = await getAllAudiobooks();
+  const related     = allBooks.filter((b) => b.category === book!.category && b.slug !== book!.slug).slice(0, 4);
+  const category    = categories.find((c) => c.slug === book!.category);
+  const hasDirectAudio = Boolean(book!.audioUrl && book!.audioUrl.trim() !== "");
 
   // AudioObject structured data — helps Google show rich results
   const audioJsonLd = {
