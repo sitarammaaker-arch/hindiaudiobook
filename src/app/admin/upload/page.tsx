@@ -379,6 +379,45 @@ export default function UploadPage() {
     if (data.success) loadData();
   };
 
+  // ── Generate export code for audiobooks.ts ──────────────────────────────
+  const generateExportCode = () => {
+    const lines = audiobooks.map((book, i) => {
+      const desc = (book.description || "").replace(/`/g, "'");
+      const id = 22 + i;
+      return [
+        "  {",
+        "    id: " + id + ",",
+        '    title: "' + book.title + '",',
+        '    slug: "' + book.slug + '",',
+        '    videoId: "' + book.videoId + '",',
+        '    thumbnail: "https://img.youtube.com/vi/' + book.videoId + '/hqdefault.jpg",',
+        '    duration: "' + (book.duration || "Unknown") + '",',
+        '    category: "' + book.category + '",',
+        '    author: "' + book.author + '",',
+        "    plays: 0,",
+        "    trending: " + book.trending + ",",
+        "    latest: " + book.latest + ",",
+        '    audioUrl: "' + (book.audioUrl || "") + '",',
+        "    description: `" + desc + "`,",
+        "  },",
+      ].join("\n");
+    });
+    return "// ── audiobooks.ts mein add karein (last book ke baad) ──\n" + lines.join("\n\n");
+  };
+
+  const generatePreviewCode = () => {
+    return audiobooks.map((book, i) => {
+      const desc = (book.description || "").substring(0, 80) + "...";
+      return [
+        "  { id: " + (22 + i) + ',',
+        '    title: "' + book.title + '",',
+        '    slug: "' + book.slug + '",',
+        '    author: "' + book.author + '",',
+        '    category: "' + book.category + '" },',
+      ].join(" ");
+    }).join("\n");
+  };
+
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50">
@@ -691,6 +730,7 @@ export default function UploadPage() {
                 <p className="text-gray-500 text-sm">Load ho raha hai...</p>
               </div>
             ) : (
+              <>
                 {/* ── PERMANENT FIX PANEL ── */}
                 <div className="rounded-2xl overflow-hidden border-2"
                   style={{ borderColor: "#FF6B2B", background: "#FFF8F5" }}>
@@ -715,20 +755,13 @@ export default function UploadPage() {
                       <button
                         onClick={() => {
                           if (audiobooks.length === 0) return;
-                          let maxId = 21; // current last static ID
-                          const code = audiobooks.map((book, i) => {
-                            maxId++;
-                            const desc = (book.description || "").replace(/`/g, "'");
-                            return `  {\n    id: ${maxId},\n    title: "${book.title}",\n    slug: "${book.slug}",\n    videoId: "${book.videoId}",\n    thumbnail: "https://img.youtube.com/vi/${book.videoId}/hqdefault.jpg",\n    duration: "${book.duration || "Unknown"}",\n    category: "${book.category}",\n    author: "${book.author}",\n    plays: 0,\n    trending: ${book.trending},\n    latest: ${book.latest},\n    audioUrl: "${book.audioUrl || ""}",\n    description: \`${desc}\`,\n  },`;
-                          }).join("\n\n");
-                          const fullCode = `// ── ADD KAREIN audiobooks.ts mein — last book ke baad ──\n${code}`;
-                          navigator.clipboard.writeText(fullCode).then(() => {
-                            alert("✅ Code copy ho gaya! Ab audiobooks.ts mein paste karein.");
-                          }).catch(() => {
-                            // Fallback — show in textarea
-                            const ta = document.getElementById("export-code") as HTMLTextAreaElement;
-                            if (ta) { ta.value = fullCode; ta.select(); }
-                          });
+                          const code = generateExportCode();
+                          navigator.clipboard.writeText(code)
+                            .then(() => alert("Code copy ho gaya! Ab audiobooks.ts mein paste karein."))
+                            .catch(() => {
+                              const ta = document.getElementById("export-code") as HTMLTextAreaElement;
+                              if (ta) { ta.value = code; ta.select(); }
+                            });
                         }}
                         disabled={audiobooks.length === 0}
                         className="text-xs font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
@@ -742,17 +775,19 @@ export default function UploadPage() {
                         Koi uploaded book nahi hai — "Audiobook" tab se pehle add karein
                       </p>
                     ) : (
-                      <textarea id="export-code" readOnly rows={8}
-                        className="w-full rounded-xl border text-xs font-mono p-3 resize-none"
+                      <textarea
+                        id="export-code"
+                        readOnly
+                        rows={8}
+                        className="w-full rounded-xl border text-xs p-3 resize-none"
                         style={{
-                          background: "#1A1A2E", color: "#FF9A5C",
+                          background: "#1A1A2E",
+                          color: "#FF9A5C",
                           borderColor: "rgba(255,107,43,0.3)",
-                          fontFamily: "monospace", lineHeight: "1.6",
+                          fontFamily: "monospace",
+                          lineHeight: "1.6",
                         }}
-                        value={audiobooks.map((book, i) => {
-                          const desc = (book.description || "").replace(/`/g, "'").substring(0, 100) + "...";
-                          return `  {\n    id: ${22 + i}, title: "${book.title}", slug: "${book.slug}",\n    videoId: "${book.videoId}", category: "${book.category}", author: "${book.author}",\n    trending: ${book.trending}, latest: ${book.latest}, audioUrl: "${book.audioUrl || ""}",\n    description: \`${desc}\`,\n  },`;
-                        }).join("\n")}
+                        defaultValue={generatePreviewCode()}
                         onClick={(e) => (e.target as HTMLTextAreaElement).select()}
                       />
                     )}
