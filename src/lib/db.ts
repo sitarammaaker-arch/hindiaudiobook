@@ -1,15 +1,58 @@
+// ── Database Layer ────────────────────────────────────────────────────────────
+// Vercel par filesystem read-only hai — isliye /tmp directory use karte hain.
+// /tmp Vercel par writable hota hai, lekin:
+//   ⚠️  Deploy/restart par data reset ho jaata hai
+//   ✅  Single session mein data persist karta hai
+//   ✅  Multiple requests ke beech data share hota hai (same instance)
+//
+// Production ke liye upgrade: Vercel KV, PlanetScale, ya Supabase
+
 import fs from "fs";
 import path from "path";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+// /tmp is always writable on Vercel (and locally)
+const TMP_DIR = "/tmp/hindiaudiobook-data";
+// Fallback: local data dir for development
+const LOCAL_DIR = path.join(process.cwd(), "data");
 
-function ensureDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+function getDataDir(): string {
+  // On Vercel, process.env.VERCEL is set
+  if (process.env.VERCEL) {
+    if (!fs.existsSync(TMP_DIR)) {
+      fs.mkdirSync(TMP_DIR, { recursive: true });
+    }
+    return TMP_DIR;
+  }
+  // Local development — use /data folder
+  if (!fs.existsSync(LOCAL_DIR)) {
+    fs.mkdirSync(LOCAL_DIR, { recursive: true });
+  }
+  return LOCAL_DIR;
+}
+
+// Seed /tmp with initial data from /data if /tmp file doesn't exist yet
+function seedIfNeeded(filename: string): void {
+  const tmpFile = path.join(TMP_DIR, filename);
+  const localFile = path.join(LOCAL_DIR, filename);
+  
+  if (!fs.existsSync(tmpFile) && fs.existsSync(localFile)) {
+    try {
+      fs.copyFileSync(localFile, tmpFile);
+    } catch {
+      // If copy fails, start with empty array
+    }
+  }
 }
 
 export function readJSON<T>(filename: string): T[] {
-  ensureDir();
-  const file = path.join(DATA_DIR, filename);
+  const dir = getDataDir();
+  
+  // On Vercel, try to seed from local data first
+  if (process.env.VERCEL) {
+    seedIfNeeded(filename);
+  }
+  
+  const file = path.join(dir, filename);
   if (!fs.existsSync(file)) return [];
   try {
     const raw = fs.readFileSync(file, "utf-8");
@@ -20,9 +63,14 @@ export function readJSON<T>(filename: string): T[] {
 }
 
 export function writeJSON<T>(filename: string, data: T[]): void {
-  ensureDir();
-  const file = path.join(DATA_DIR, filename);
-  fs.writeFileSync(file, JSON.stringify(data, null, 2), "utf-8");
+  const dir = getDataDir();
+  const file = path.join(dir, filename);
+  try {
+    fs.writeFileSync(file, JSON.stringify(data, null, 2), "utf-8");
+  } catch (err) {
+    console.error(`writeJSON failed for ${filename}:`, err);
+    throw new Error(`Data save nahi ho saka: ${filename}`);
+  }
 }
 
 export function nextId(items: { id: number }[]): number {

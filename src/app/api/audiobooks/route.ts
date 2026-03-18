@@ -19,8 +19,12 @@ type Audiobook = {
 };
 
 export async function GET() {
-  const books = readJSON<Audiobook>("audiobooks.json");
-  return NextResponse.json({ success: true, data: books, count: books.length });
+  try {
+    const books = readJSON<Audiobook>("audiobooks.json");
+    return NextResponse.json({ success: true, data: books, count: books.length });
+  } catch (err) {
+    return NextResponse.json({ success: false, data: [], count: 0 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -28,7 +32,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { title, author, category, duration, videoIdRaw, audioUrl, trending, latest, description } = body;
 
-    // Validation
     if (!title?.trim()) return NextResponse.json({ success: false, error: "Title zaroori hai" }, { status: 400 });
     if (!author?.trim()) return NextResponse.json({ success: false, error: "Author zaroori hai" }, { status: 400 });
     if (!videoIdRaw?.trim()) return NextResponse.json({ success: false, error: "YouTube Video ID zaroori hai" }, { status: 400 });
@@ -37,7 +40,6 @@ export async function POST(req: NextRequest) {
     const videoId = extractVideoId(videoIdRaw);
     const slug = makeSlug(title);
 
-    // Check duplicate slug
     if (books.find((b) => b.slug === slug)) {
       return NextResponse.json({ success: false, error: "Is title ka audiobook already exist karta hai" }, { status: 409 });
     }
@@ -49,7 +51,7 @@ export async function POST(req: NextRequest) {
       videoId,
       thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
       duration: duration?.trim() || "Unknown",
-      category: category || "motivational",
+      category: category || "self-help",
       author: author.trim(),
       description: description?.trim() || "",
       trending: Boolean(trending),
@@ -62,8 +64,16 @@ export async function POST(req: NextRequest) {
     books.push(newBook);
     writeJSON("audiobooks.json", books);
 
-    return NextResponse.json({ success: true, data: newBook, message: "Audiobook successfully add ho gaya!" });
-  } catch (err) {
-    return NextResponse.json({ success: false, error: "Server error — dobara try karein" }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      data: newBook,
+      message: "Audiobook successfully add ho gaya!",
+    });
+  } catch (err: any) {
+    console.error("POST /api/audiobooks error:", err);
+    return NextResponse.json({
+      success: false,
+      error: err?.message || "Server error — dobara try karein",
+    }, { status: 500 });
   }
 }
