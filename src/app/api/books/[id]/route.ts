@@ -1,83 +1,71 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJSON, writeJSON, nextId, makeSlug, extractVideoId } from "@/lib/db";
+import { readJSONAsync, writeJSONAsync, nextId } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 type Chapter = {
-  id: number;
-  chapterNumber: number;
-  title: string;
-  slug: string;
-  duration: string;
-  description: string;
-  audioUrl: string;
-  videoId: string;
-  thumbnail: string;
-  isFree: boolean;
+  id: number; chapterNumber: number; title: string; slug: string;
+  duration: string; description: string; audioUrl: string;
+  videoId: string; isFree: boolean;
 };
-
 type Book = {
-  id: number;
-  title: string;
-  slug: string;
-  thumbnail: string;
-  totalChapters: number;
-  chapters: Chapter[];
-  [key: string]: unknown;
+  id: number; title: string; slug: string; author: string;
+  category: string; totalChapters: number; totalDuration: string;
+  description: string; trending: boolean; latest: boolean;
+  thumbnail: string; chapters: Chapter[]; createdAt: string;
 };
 
-// POST /api/books/[id]/chapter — add chapter to book
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+// GET single book
+export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const books = await readJSONAsync<Book>("books.json");
-    const bookId = Number(params.id);
-    const idx = books.findIndex((b) => b.id === bookId);
-
-    if (idx === -1) return NextResponse.json({ success: false, error: "Book nahi mili" }, { status: 404 });
-
-    const body = await req.json();
-    const { title, chapterNumber, duration, description, audioUrl, videoIdRaw, isFree } = body;
-
-    if (!title?.trim()) return NextResponse.json({ success: false, error: "Chapter title zaroori hai" }, { status: 400 });
-
-    const book = books[idx];
-    const videoId = extractVideoId(videoIdRaw || "");
-    const chapNum = Number(chapterNumber) || book.chapters.length + 1;
-
-    // All chapter ids across all books for unique id
-    const allChapIds = books.flatMap((b) => b.chapters.map((c) => c.id));
-    const newChapterId = allChapIds.length > 0 ? Math.max(...allChapIds) + 1 : 1;
-
-    const newChapter: Chapter = {
-      id: newChapterId,
-      chapterNumber: chapNum,
-      title: title.trim(),
-      slug: `chapter-${chapNum}-${makeSlug(title)}`,
-      duration: duration?.trim() || "Unknown",
-      description: description?.trim() || "",
-      audioUrl: audioUrl?.trim() || "",
-      videoId,
-      thumbnail: book.thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : ""),
-      isFree: Boolean(isFree),
-    };
-
-    book.chapters.push(newChapter);
-    book.totalChapters = book.chapters.length;
-    books[idx] = book;
-    writeJSON("books.json", books);
-
-    return NextResponse.json({ success: true, data: newChapter, message: `Chapter ${chapNum} add ho gaya!` });
-  } catch {
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+    const book = books.find((b) => b.id === Number(params.id));
+    if (!book) return NextResponse.json({ success: false, error: "Book nahi mili" }, { status: 404 });
+    return NextResponse.json({ success: true, data: book });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err?.message }, { status: 500 });
   }
 }
 
-// DELETE /api/books/[id] — delete whole book
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const books = await readJSONAsync<Book>("books.json");
-  const id = Number(params.id);
-  const filtered = books.filter((b) => b.id !== id);
-  if (filtered.length === books.length) {
-    return NextResponse.json({ success: false, error: "Book nahi mili" }, { status: 404 });
+// POST — add chapter to book
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const body = await req.json();
+    const books = await readJSONAsync<Book>("books.json");
+    const bookIdx = books.findIndex((b) => b.id === Number(params.id));
+    if (bookIdx === -1) return NextResponse.json({ success: false, error: "Book nahi mili" }, { status: 404 });
+
+    const newChapter: Chapter = {
+      id: nextId(books[bookIdx].chapters),
+      chapterNumber: books[bookIdx].chapters.length + 1,
+      title: body.title?.trim() || "Chapter",
+      slug: `chapter-${books[bookIdx].chapters.length + 1}-${(body.title || "").toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").substring(0, 40)}`,
+      duration: body.duration?.trim() || "Unknown",
+      description: body.description?.trim() || "",
+      audioUrl: body.audioUrl?.trim() || "",
+      videoId: body.videoId?.trim() || "",
+      isFree: Boolean(body.isFree),
+    };
+
+    books[bookIdx].chapters.push(newChapter);
+    books[bookIdx].totalChapters = books[bookIdx].chapters.length;
+    await writeJSONAsync("books.json", books);
+
+    return NextResponse.json({ success: true, data: newChapter, message: `Chapter "${newChapter.title}" add ho gaya!` });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err?.message || "Server error" }, { status: 500 });
   }
-  writeJSON("books.json", filtered);
-  return NextResponse.json({ success: true, message: "Book delete ho gayi" });
+}
+
+// DELETE book
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const books = await readJSONAsync<Book>("books.json");
+    const filtered = books.filter((b) => b.id !== Number(params.id));
+    if (filtered.length === books.length) return NextResponse.json({ success: false, error: "Book nahi mili" }, { status: 404 });
+    await writeJSONAsync("books.json", filtered);
+    return NextResponse.json({ success: true, message: "Book delete ho gayi" });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err?.message || "Server error" }, { status: 500 });
+  }
 }
