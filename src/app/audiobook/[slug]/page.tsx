@@ -68,7 +68,9 @@ export default async function AudiobookDetailPage({ params }: Props) {
 
   const allBooks    = await getAllAudiobooks();
   const related     = allBooks.filter((b) => b.category === book!.category && b.slug !== book!.slug).slice(0, 4);
-  const category    = categories.find((c) => c.slug === book!.category);
+  // Trim category slug to handle any whitespace from KV storage
+  const categorySlug = book!.category?.trim() || "";
+  const category    = categories.find((c) => c.slug === categorySlug);
   const hasDirectAudio = Boolean(book!.audioUrl && book!.audioUrl.trim() !== "");
 
   // AudioObject structured data — helps Google show rich results
@@ -116,7 +118,7 @@ export default async function AudiobookDetailPage({ params }: Props) {
         <Link href="/" className="hover:text-[#FF6B2B] transition-colors flex-shrink-0">Home</Link>
         <span className="flex-shrink-0">/</span>
         <Link href={`/category/${book.category}`} className="hover:text-[#FF6B2B] transition-colors flex-shrink-0">
-          {category?.emoji} <span className="hidden sm:inline">{category?.label}</span><span className="sm:hidden">{category?.label?.split(" ")[0]}</span>
+          {category?.emoji} <span className="hidden sm:inline">{category?.label || categorySlug}</span><span className="sm:hidden">{(category?.label || categorySlug).split(" ")[0]}</span>
         </Link>
         <span className="flex-shrink-0">/</span>
         <span className="text-gray-900 font-medium line-clamp-1 min-w-0 truncate">{book.title}</span>
@@ -153,11 +155,15 @@ export default async function AudiobookDetailPage({ params }: Props) {
           {/* Title + badges */}
           <div>
             <div className="flex flex-wrap gap-2 mb-4">
-              {category && (
+              {category ? (
                 <span style={{ background: `linear-gradient(to right, ${category.bgFrom}, ${category.bgTo})` }} className="text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
                   {category.emoji} {category.label}
                 </span>
-              )}
+              ) : categorySlug ? (
+                <span className="bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-full">
+                  {categorySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                </span>
+              ) : null}
               <span className="bg-gray-100 text-gray-600 text-xs font-medium px-3 py-1.5 rounded-full">⏱ {book.duration}</span>
               <span className="bg-gray-100 text-gray-600 text-xs font-medium px-3 py-1.5 rounded-full">👁 {(book.plays / 1000).toFixed(0)}K plays</span>
               <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full">🆓 Free</span>
@@ -165,7 +171,7 @@ export default async function AudiobookDetailPage({ params }: Props) {
             </div>
             {/* H1 with keyword: "[Book] Hindi Audiobook" */}
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">{book.title}</h1>
-            <p className="text-gray-500 font-medium">by {book.author}</p>
+            <p className="text-gray-500 font-medium">by {book.author?.replace(/^by\s+/i, "") || book.author}</p>
           </div>
 
           {/* Action buttons */}
@@ -216,8 +222,10 @@ export default async function AudiobookDetailPage({ params }: Props) {
             <div className="space-y-3">
               {[
                 { label: "Title", value: book.title },
-                { label: "Author", value: book.author },
-                { label: "Category", value: `${category?.emoji} ${category?.label}` },
+                { label: "Author", value: book.author?.replace(/^by\s+/i, "") || book.author },
+                { label: "Category", value: category
+                    ? `${category.emoji} ${category.label}`
+                    : categorySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "General" },
                 { label: "Language", value: "Hindi 🇮🇳" },
                 { label: "Player", value: hasDirectAudio ? "🟢 HTML5 (Lock Screen ✅)" : "🔴 YouTube Only" },
                 { label: "Price", value: "🆓 Bilkul Free" },
