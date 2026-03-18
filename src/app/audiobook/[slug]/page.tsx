@@ -120,25 +120,13 @@ export default function AudiobookDetailPage({ params }: Props) {
                   className="w-full h-full"
                 />
               </div>
-            </div>
-            {/* Warning sirf development mein dikhao — production visitors ko nahi */}
-            {process.env.NODE_ENV === "development" && (
-              <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-3">
-                <span className="text-amber-500 text-lg flex-shrink-0">⚠️</span>
-                <div>
-                  <p className="text-amber-800 text-sm font-semibold">YouTube embed — screen lock karne par ruk jaayega.</p>
-                  <p className="text-amber-600 text-xs mt-0.5">Lock screen play ke liye <code className="bg-amber-100 px-1 rounded">audioUrl</code> mein MP3 link add karein.</p>
-                </div>
-              </div>
-            )}
-            {/* Production mein: soft info badge — non-intrusive */}
-            {process.env.NODE_ENV !== "development" && (
+              {/* Soft info hint — non-intrusive for visitors */}
               <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl text-xs"
                 style={{ background: "#FFF8F5", color: "#9CA3AF", fontFamily: "var(--font-inter)" }}>
                 <span>💡</span>
                 <span>Screen lock ke baad sunne ke liye <strong style={{ color: "#FF6B2B" }}>🔒 Lock Screen ✅</strong> badge wali books chunein</span>
               </div>
-            )}
+            </div>
           )}
 
           {/* Title + badges */}
