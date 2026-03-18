@@ -56,22 +56,20 @@ Yeh book aapko woh insider knowledge degi jo normal trading courses mein nahi mi
   },
   {
     id: 3,
-    title: "Trading in the Zone Hindi Audiobook",
+    title: "Trading In The Zone Full Hindi Audiobook",
     slug: "trading-in-the-zone-hindi",
-    videoId: "D9oQKzSNNB0",
-    thumbnail: "https://img.youtube.com/vi/D9oQKzSNNB0/hqdefault.jpg",
-    duration: "3h 45m",
+    videoId: "XGJYX7-NsQM",
+    thumbnail: "https://img.youtube.com/vi/XGJYX7-NsQM/hqdefault.jpg",
+    duration: "8h 31m",
     category: "trading-psychology",
     author: "Mark Douglas",
-    plays: 95000,
+    plays: 0,
     trending: true,
     latest: true,
     audioUrl: "",
-    description: `Trading in the Zone — Mark Douglas ki doosri masterpiece. "The Disciplined Trader" ke baad yeh book aapko agle level par le jaati hai.
-
-Is book ka central idea hai "probabilistic thinking" — har trade ek independent event hai, aur market ka behavior inherently uncertain hai. Jo trader yeh accept kar leta hai woh consistently profitable ho jaata hai. Jo trader "sure shot" dhundhta rehta hai woh hamesha disappoint hota hai.
-
-Hindi mein yeh audiobook sunn kar aap trading ke baare mein apna poora perspective badal lenge. Concepts jaise "The Five Fundamental Truths" aur "The Seven Principles of Consistency" aapki trading journey transform kar denge.`,
+    description: `Trading in the Zone — Full Hindi Audiobook | Mark Douglas
+Kya aap ek aisa trader banna chahte hain jo consistently profit kamata hai? Kya aap haar trade ke baad emotionally devastated feel karte hain? Kya aap jaanna chahte hain ki duniya ke sabse successful traders ka secret kya hai?
+Agar haan, toh Trading in the Zone Full Hindi Audiobook — Mark Douglas ki is masterpiece ko — aaj hi sunna shuru karein. Yeh sirf ek trading book nahi hai — yeh ek complete mental transformation guide hai jo aapki trading life hamesha ke liye badal degi.`,
   },
   {
     id: 4,
@@ -427,23 +425,7 @@ Devotion, strength, aur loyalty ka sandesh. Bacche Hanuman ji se connect karte h
 
 Background music aur awaaz itni engaging hai ki ghar ke sab log — bade bhi — sun lete hain!`,
   },
-    {
-    id: Date.now(), // Replace with next number in your list
-    title: "Trading In The Zone Full Hindi Audiobook",
-    slug: "trading-in-the-zone-full-hindi-audiobook",
-    videoId: "XGJYX7-NsQM",
-    thumbnail: "https://img.youtube.com/vi/XGJYX7-NsQM/hqdefault.jpg",
-    duration: "8h 31m",
-    category: "motivational",
-    author: "by Mark Douglas",
-    plays: 0,
-    trending: true,
-    latest: true,
-    audioUrl: "",
-    description: `Trading in the Zone — Full Hindi Audiobook | Mark Douglas
-Kya aap ek aisa trader banna chahte hain jo consistently profit kamata hai? Kya aap haar trade ke baad emotionally devastated feel karte hain? Kya aap jaanna chahte hain ki duniya ke sabse successful traders ka secret kya hai?
-Agar haan, toh Trading in the Zone Full Hindi Audiobook — Mark Douglas ki is masterpiece ko — aaj hi sunna shuru karein. Yeh sirf ek trading book nahi hai — yeh ek complete mental transformation guide hai jo aapki trading life hamesha ke liye badal degi.`,
-  },
+    
 ];
 
 // ── UPDATED CATEGORIES — GSC data se optimize kiya ──────────────────────────
