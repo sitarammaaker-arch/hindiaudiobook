@@ -45,17 +45,17 @@ export default async function AuthorsPage() {
       shortBio: author.shortBio,
       genre: author.genre,
       bookCount: Math.max(bySlugLinks, byName),
-    };
-  });
-
-  const dynamicOnlyCards: AuthorCard[] = [...dynamicCounts.entries()]
+      };
+      });
+    	
+       const dynamicOnlyCards: AuthorCard[] = Array.from(dynamicCounts.entries())
     .filter(([normalized]) => !staticByName.has(normalized))
     .map(([, value]) => ({
-      slug: makeAuthorSlug(value.name),
-      name: value.name,
-      nationality: "Author",
-      shortBio: `${value.name} ki uploaded Hindi audiobooks sunne ke liye profile dekhein.`,
-      genre: ["Audiobooks"],
+    slug: makeAuthorSlug(value.name),
+    name: value.name,
+    nationality: "Author",
+    shortBio: `${value.name} ki uploaded Hindi audiobooks sunne ke liye profile dekhein.`,
+    genre: ["Audiobooks"],
       bookCount: value.count,
     }));
 
