@@ -8,6 +8,7 @@ type Audiobook = {
   category: string; duration: string; videoId: string;
   audioUrl: string; thumbnail: string; trending: boolean;
   latest: boolean; plays: number; createdAt: string;
+  description: string;
 };
 type Chapter = {
   id: number; chapterNumber: number; title: string; slug: string;
