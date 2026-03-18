@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-eexport default async function AuthorPage({ params }: Props) {
+export default async function AuthorPage({ params }: Props) {
   const allBooks = await getAllAudiobooks();
   const staticAuthor = getAuthorBySlug(params.slug);
   const dynamicBySlug = allBooks.filter((b) => makeAuthorSlug(b.author || "") === params.slug);
