@@ -8,7 +8,6 @@ import SectionHeader from "@/components/SectionHeader";
 import GoogleAd from "@/components/GoogleAd";
 import { getAllAudiobooks, getAllChapterBooks } from "@/lib/data";
 import { categories } from "@/data/audiobooks";
-
 // Force dynamic rendering — so uploaded audiobooks show immediately
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -51,10 +50,10 @@ const orgJsonLd = {
   "logo": "https://www.hindiaudiobook.com/logo.png",
 };
 
-export default function HomePage() {
-  // ✅ getAllAudiobooks() = static audiobooks.ts + dynamic /tmp uploads MERGED
-  const allBooks    = getAllAudiobooks();
-  const chapterBooks = getAllChapterBooks();
+export default async function HomePage() {
+  // ✅ getAllAudiobooks() = static + KV uploaded books MERGED
+  const allBooks     = await getAllAudiobooks();
+  const chapterBooks = await getAllChapterBooks();
 
   const trending = allBooks.filter((b) => b.trending);
   const latest   = allBooks.filter((b) => b.latest).slice(0, 6);

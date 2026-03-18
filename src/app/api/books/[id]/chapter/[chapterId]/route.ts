@@ -8,7 +8,7 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string; chapterId: string } }
 ) {
-  const books = readJSON<Book>("books.json");
+  const books = await readJSONAsync<Book>("books.json");
   const bookId = Number(params.id);
   const chapterId = Number(params.chapterId);
 

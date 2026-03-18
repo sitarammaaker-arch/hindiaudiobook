@@ -27,7 +27,7 @@ type Book = {
 // POST /api/books/[id]/chapter — add chapter to book
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const books = readJSON<Book>("books.json");
+    const books = await readJSONAsync<Book>("books.json");
     const bookId = Number(params.id);
     const idx = books.findIndex((b) => b.id === bookId);
 
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
 // DELETE /api/books/[id] — delete whole book
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
-  const books = readJSON<Book>("books.json");
+  const books = await readJSONAsync<Book>("books.json");
   const id = Number(params.id);
   const filtered = books.filter((b) => b.id !== id);
   if (filtered.length === books.length) {

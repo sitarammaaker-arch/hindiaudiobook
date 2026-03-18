@@ -33,7 +33,7 @@ type Book = {
 };
 
 export async function GET() {
-  const books = readJSON<Book>("books.json");
+  const books = await readJSONAsync<Book>("books.json");
   return NextResponse.json({ success: true, data: books, count: books.length });
 }
 
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     if (!title?.trim()) return NextResponse.json({ success: false, error: "Title zaroori hai" }, { status: 400 });
     if (!author?.trim()) return NextResponse.json({ success: false, error: "Author zaroori hai" }, { status: 400 });
 
-    const books = readJSON<Book>("books.json");
+    const books = await readJSONAsync<Book>("books.json");
     const slug = makeSlug(title) + "-chapters";
     const videoId = extractVideoId(videoIdRaw || "");
 
