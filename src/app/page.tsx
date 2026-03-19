@@ -170,11 +170,11 @@ export default async function HomePage() {
           <SectionHeader title="🔍 Most Searched Hindi Audiobooks" subtitle="Google par sabse zyada dhundhe jaate hain" />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[
-              { title: "Disciplined Trader", slug: "the-disciplined-trader-hindi",     emoji: "📈", desc: "Trading mindset" },
+              { title: "Disciplined Trader", slug: "the-disciplined-trader-hindi-audiobook",     emoji: "📈", desc: "Trading mindset" },
               { title: "Market Wizards",     slug: "market-wizards-hindi",             emoji: "🧙", desc: "Trading legends" },
               { title: "48 Laws of Power",   slug: "48-laws-of-power-hindi",           emoji: "👑", desc: "Power & strategy" },
               { title: "Millionaire Mind",   slug: "secrets-of-millionaire-mind-hindi",emoji: "💰", desc: "Wealth mindset" },
-              { title: "Zero to One",        slug: "zero-to-one-hindi",                emoji: "🚀", desc: "Startup thinking" },
+              { title: "Zero to One",        slug: "zero-to-one-hindi-audiobook",                emoji: "🚀", desc: "Startup thinking" },
             ].map((item) => (
               <Link key={item.slug} href={`/audiobook/${item.slug}`}
                 className="group bg-gray-50 hover:bg-[#FFF1EB] border border-gray-100 hover:border-[rgba(255,107,43,0.3)] rounded-2xl p-4 text-center transition-all">
