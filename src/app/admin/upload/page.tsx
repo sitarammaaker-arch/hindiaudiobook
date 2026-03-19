@@ -103,7 +103,7 @@ type BulkStatus = { file: string; status: "pending" | "uploading" | "done" | "er
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 export default function UploadPage() {
-  const [tab, setTab] = useState<"audiobook" | "book" | "chapter" | "manage">("audiobook");
+  const [tab, setTab] = useState<"audiobook" | "book" | "chapter" | "manage" | "authors">("audiobook");
 
   // ── Audiobook form state ──────────────────────────────────────────────────
   const [ab, setAb] = useState({
@@ -140,6 +140,27 @@ export default function UploadPage() {
   const [manageLoading, setManageLoading] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState<Status>({ type: "idle", message: "" });
 
+  // ── Authors state ─────────────────────────────────────────────────────────
+  const [authorsList, setAuthorsList] = useState<any[]>([]);
+  const [authorsLoading, setAuthorsLoading] = useState(false);
+  const [authStatus, setAuthStatus] = useState<Status>({ type: "idle", message: "" });
+  const [newAuthor, setNewAuthor] = useState({
+    name: "", nationality: "", born: "", died: "",
+    genre: "", shortBio: "", fullBio: "", famousFor: "",
+    books: "", wikipedia: "",
+  });
+  const [editingAuthor, setEditingAuthor] = useState<string | null>(null);
+
+  const loadAuthors = useCallback(async () => {
+    setAuthorsLoading(true);
+    try {
+      const r = await fetch("/api/authors");
+      const d = await r.json();
+      if (d.success) setAuthorsList(d.data);
+    } catch {}
+    setAuthorsLoading(false);
+  }, []);
+
   const loadData = useCallback(async () => {
     setManageLoading(true);
     try {
@@ -153,7 +174,8 @@ export default function UploadPage() {
 
   useEffect(() => {
     if (tab === "manage" || tab === "chapter") loadData();
-  }, [tab, loadData]);
+    if (tab === "authors") loadAuthors();
+  }, [tab, loadData, loadAuthors]);
 
   // ── Archive fetch handlers ────────────────────────────────────────────────
 
@@ -435,11 +457,12 @@ export default function UploadPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
         {/* Tabs */}
-        <div className="grid grid-cols-4 gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100">
+        <div className="grid grid-cols-5 gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100">
           {[
             { id: "audiobook", label: "🎧 Audiobook" },
             { id: "book",      label: "📖 New Book" },
             { id: "chapter",   label: "📑 Chapter" },
+            { id: "authors",   label: "✍️ Authors" },
             { id: "manage",    label: "🗂️ Manage" },
           ].map((t) => (
             <button key={t.id} onClick={() => setTab(t.id as typeof tab)}
@@ -720,7 +743,214 @@ export default function UploadPage() {
           </div>
         )}
 
-        {/* ── TAB 4: Manage ──────────────────────────────────────────────── */}
+        {/* ── TAB 4: Authors ─────────────────────────────────────────────── */}
+        {tab === "authors" && (
+          <div className="space-y-6">
+            <StatusBar status={authStatus} />
+
+            {/* Add New Author Form */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                ✍️ {editingAuthor ? "Author Edit Karein" : "Naya Author Add Karein"}
+              </h2>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Author Name *" required>
+                  <input className={inputCls} value={newAuthor.name} placeholder="e.g. Mark Douglas"
+                    onChange={(e) => setNewAuthor(p => ({ ...p, name: e.target.value }))} />
+                </Field>
+                <Field label="Nationality" required={false}>
+                  <input className={inputCls} value={newAuthor.nationality} placeholder="e.g. American"
+                    onChange={(e) => setNewAuthor(p => ({ ...p, nationality: e.target.value }))} />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Born Year" required={false}>
+                  <input className={inputCls} value={newAuthor.born} placeholder="e.g. 1948"
+                    onChange={(e) => setNewAuthor(p => ({ ...p, born: e.target.value }))} />
+                </Field>
+                <Field label="Died Year (if applicable)" required={false}>
+                  <input className={inputCls} value={newAuthor.died} placeholder="e.g. 2015"
+                    onChange={(e) => setNewAuthor(p => ({ ...p, died: e.target.value }))} />
+                </Field>
+              </div>
+
+              <Field label="Genre (comma separated)" required={false}>
+                <input className={inputCls} value={newAuthor.genre} placeholder="e.g. Trading Psychology, Finance, Self Help"
+                  onChange={(e) => setNewAuthor(p => ({ ...p, genre: e.target.value }))} />
+              </Field>
+
+              <Field label="Famous For" required={false}>
+                <input className={inputCls} value={newAuthor.famousFor} placeholder="e.g. Trading in the Zone"
+                  onChange={(e) => setNewAuthor(p => ({ ...p, famousFor: e.target.value }))} />
+              </Field>
+
+              <Field label="Short Bio (1-2 lines)" required={false}>
+                <textarea className={inputCls} rows={2} value={newAuthor.shortBio}
+                  placeholder="Card par dikhne wali short bio..."
+                  onChange={(e) => setNewAuthor(p => ({ ...p, shortBio: e.target.value }))} />
+              </Field>
+
+              <Field label="Full Bio (SEO — 200-400 words)" required={false}>
+                <textarea className={inputCls} rows={5} value={newAuthor.fullBio}
+                  placeholder="Author page par dikhne wali detailed bio..."
+                  onChange={(e) => setNewAuthor(p => ({ ...p, fullBio: e.target.value }))} />
+              </Field>
+
+              <Field label="Book Slugs (comma separated)" required={false}>
+                <input className={inputCls} value={newAuthor.books}
+                  placeholder="e.g. trading-in-the-zone-hindi, the-disciplined-trader-hindi"
+                  onChange={(e) => setNewAuthor(p => ({ ...p, books: e.target.value }))} />
+              </Field>
+
+              <Field label="Wikipedia URL (optional)" required={false}>
+                <input className={inputCls} value={newAuthor.wikipedia}
+                  placeholder="https://en.wikipedia.org/wiki/..."
+                  onChange={(e) => setNewAuthor(p => ({ ...p, wikipedia: e.target.value }))} />
+              </Field>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={async () => {
+                    if (!newAuthor.name.trim()) {
+                      setAuthStatus({ type: "error", message: "Name zaroori hai" });
+                      return;
+                    }
+                    setAuthStatus({ type: "loading", message: "Saving..." });
+                    try {
+                      const url = editingAuthor ? `/api/authors/${editingAuthor}` : "/api/authors";
+                      const method = editingAuthor ? "PUT" : "POST";
+                      const res = await fetch(url, {
+                        method,
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          ...newAuthor,
+                          genre: newAuthor.genre.split(",").map((g: string) => g.trim()).filter(Boolean),
+                          books: newAuthor.books.split(",").map((b: string) => b.trim()).filter(Boolean),
+                        }),
+                      });
+                      const d = await res.json();
+                      if (d.success) {
+                        setAuthStatus({ type: "success", message: d.message || "Saved!" });
+                        setNewAuthor({ name: "", nationality: "", born: "", died: "", genre: "", shortBio: "", fullBio: "", famousFor: "", books: "", wikipedia: "" });
+                        setEditingAuthor(null);
+                        loadAuthors();
+                      } else {
+                        setAuthStatus({ type: "error", message: d.error });
+                      }
+                    } catch {
+                      setAuthStatus({ type: "error", message: "Server error" });
+                    }
+                  }}
+                  className="flex-1 bg-[#FF6B2B] hover:bg-[#E85A1A] text-white font-bold py-3 rounded-xl transition-colors">
+                  {editingAuthor ? "✅ Update Karein" : "➕ Author Add Karein"}
+                </button>
+                {editingAuthor && (
+                  <button
+                    onClick={() => {
+                      setEditingAuthor(null);
+                      setNewAuthor({ name: "", nationality: "", born: "", died: "", genre: "", shortBio: "", fullBio: "", famousFor: "", books: "", wikipedia: "" });
+                    }}
+                    className="px-4 py-3 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50">
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Authors List */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+                <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                  ✍️ Authors
+                  <span className="bg-[#FFF1EB] text-[#E85A1A] text-xs font-bold px-2 py-0.5 rounded-full">
+                    {authorsList.length}
+                  </span>
+                </h3>
+                <button onClick={loadAuthors} className="text-[#FF6B2B] text-sm hover:underline font-medium">↻ Refresh</button>
+              </div>
+
+              {authorsLoading ? (
+                <div className="p-8 text-center text-gray-400 text-sm">Load ho raha hai...</div>
+              ) : authorsList.length === 0 ? (
+                <div className="p-8 text-center text-gray-400 text-sm">Koi author nahi — upar se add karein</div>
+              ) : (
+                <div className="divide-y divide-gray-50">
+                  {authorsList.map((author: any) => (
+                    <div key={author.slug} className="flex items-center gap-3 px-5 py-3.5 hover:bg-gray-50">
+                      <div className="w-10 h-10 rounded-full bg-[#FFF1EB] flex items-center justify-center text-[#E85A1A] font-bold text-sm flex-shrink-0">
+                        {author.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 text-sm">{author.name}</p>
+                        <p className="text-gray-500 text-xs">{author.nationality} · {(author.genre || []).slice(0, 2).join(", ")}</p>
+                        <p className="text-gray-400 text-xs">{(author.books || []).length} books linked</p>
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => {
+                            setEditingAuthor(author.slug);
+                            setNewAuthor({
+                              name: author.name || "",
+                              nationality: author.nationality || "",
+                              born: author.born || "",
+                              died: author.died || "",
+                              genre: (author.genre || []).join(", "),
+                              shortBio: author.shortBio || "",
+                              fullBio: author.fullBio || "",
+                              famousFor: author.famousFor || "",
+                              books: (author.books || []).join(", "),
+                              wikipedia: author.wikipedia || "",
+                            });
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          className="w-7 h-7 bg-blue-50 hover:bg-blue-100 text-blue-500 rounded-lg flex items-center justify-center text-xs">
+                          ✏️
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (!confirm(`"${author.name}" delete karna chahte hain?`)) return;
+                            const res = await fetch(`/api/authors/${author.slug}`, { method: "DELETE" });
+                            const d = await res.json();
+                            if (d.success) {
+                              setAuthStatus({ type: "success", message: `"${author.name}" delete ho gaye` });
+                              loadAuthors();
+                            }
+                          }}
+                          className="w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg flex items-center justify-center">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Seed button */}
+            <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
+              <p className="text-gray-500 text-sm mb-3">9 original static authors ko KV mein seed karna hai?</p>
+              <button
+                onClick={async () => {
+                  const res = await fetch("/api/seed-authors");
+                  const d = await res.json();
+                  if (d.success) {
+                    setAuthStatus({ type: "success", message: `${d.authors?.length} authors seeded!` });
+                    loadAuthors();
+                  }
+                }}
+                className="text-sm font-semibold px-6 py-2 rounded-xl border-2 transition-colors"
+                style={{ borderColor: "#FF6B2B", color: "#FF6B2B" }}>
+                🌱 Seed Original 9 Authors
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB 5: Manage ──────────────────────────────────────────────── */}
         {tab === "manage" && (
           <div className="space-y-6">
             <StatusBar status={deleteStatus} />

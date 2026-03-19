@@ -73,3 +73,20 @@ export async function getCategoryCounts(): Promise<Record<string, number>> {
 
 export { categories };
 export type { Audiobook, ChapterBook };
+
+import { getAllAuthorsFromKV, saveAllAuthors } from "./db";
+import { SEED_AUTHORS, type Author } from "@/data/authors";
+
+export async function getAllAuthors(): Promise<Author[]> {
+  try {
+    const kvAuthors = await getAllAuthorsFromKV();
+    if (kvAuthors !== null) {
+      return kvAuthors as Author[];
+    }
+    // First time — auto-seed KV with static authors
+    await saveAllAuthors(SEED_AUTHORS);
+    return SEED_AUTHORS;
+  } catch {
+    return SEED_AUTHORS;
+  }
+}

@@ -133,3 +133,31 @@ export function extractVideoId(input: string): string {
   } catch {}
   return input.trim();
 }
+
+// ── Authors KV ────────────────────────────────────────────────────────────
+export async function getAllAuthorsFromKV() {
+  if (hasRedis()) {
+    try {
+      const redis = await getRedis();
+      const data = await redis.get<any[]>("ha:authors");
+      return data ?? null; // null = not seeded yet
+    } catch { return null; }
+  }
+  return null; // local = use static
+}
+
+export async function saveAllAuthors(authors: any[]): Promise<void> {
+  if (hasRedis()) {
+    try {
+      const redis = await getRedis();
+      await redis.set("ha:authors", authors);
+    } catch (e) { console.error("Authors KV save error:", e); }
+  }
+}
+
+export async function deleteAuthor(slug: string): Promise<void> {
+  const authors = await getAllAuthorsFromKV();
+  if (!authors) return;
+  const filtered = authors.filter((a: any) => a.slug !== slug);
+  await saveAllAuthors(filtered);
+}
