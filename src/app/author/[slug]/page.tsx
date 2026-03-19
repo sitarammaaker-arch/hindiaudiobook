@@ -19,13 +19,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${author.name} — Hindi Audiobooks Free | HindiAudiobook.com`,
     description: `${author.name} ki sabhi Hindi audiobooks free mein sunein — HindiAudiobook.com. ${author.shortBio}`,
     alternates: { canonical: `https://www.hindiaudiobook.com/author/${author.slug}` },
-    openGraph: {
-      title: `${author.name} Hindi Audiobooks`,
-      description: author.shortBio,
-      url: `https://www.hindiaudiobook.com/author/${author.slug}`,
-      siteName: "Hindi Audiobook",
-      locale: "hi_IN",
-    },
   };
 }
 
@@ -33,12 +26,9 @@ export default function AuthorPage({ params }: Props) {
   const author = getAuthorBySlug(params.slug);
   if (!author) notFound();
 
-  // Get all audiobooks by this author
-  const authorBooks = audiobooks.filter((b) =>
-    author.books.includes(b.slug)
-  );
+  // Static books only (no KV call — avoids build timeout)
+  const authorBooks = audiobooks.filter((b) => author.books.includes(b.slug));
 
-  // JSON-LD — Person schema
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -50,11 +40,9 @@ export default function AuthorPage({ params }: Props) {
     ...(author.wikipedia ? { "sameAs": author.wikipedia } : {}),
   };
 
-  // Initials for avatar
   const initials = author.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
-  // Avatar bg color based on slug
-  const avatarColors: Record<string, string> = {
+  const avatarColor = ({
     "mark-douglas":    { bg: "#E6F1FB", text: "#185FA5" },
     "jack-d-schwager": { bg: "#E1F5EE", text: "#0F6E56" },
     "mark-minervini":  { bg: "#FAEEDA", text: "#854F0B" },
@@ -64,7 +52,7 @@ export default function AuthorPage({ params }: Props) {
     "james-clear":     { bg: "#EEEDFE", text: "#534AB7" },
     "napoleon-hill":   { bg: "#FAECE7", text: "#993C1D" },
     "paulo-coelho":    { bg: "#EEEDFE", text: "#534AB7" },
-  }[author.slug] ?? { bg: "#F1EFE8", text: "#5F5E5A" };
+  } as Record<string, { bg: string; text: string }>)[author.slug] ?? { bg: "#F1EFE8", text: "#5F5E5A" };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -81,30 +69,24 @@ export default function AuthorPage({ params }: Props) {
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-
-        {/* ── LEFT: Author profile ── */}
+        {/* Left: Profile */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm sticky top-24">
-
-            {/* Avatar */}
             <div className="flex flex-col items-center mb-6">
-              <div
-                className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold mb-4 shadow-md"
-                style={{ background: (avatarColors as any).bg, color: (avatarColors as any).text }}
-              >
+              <div className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold mb-4 shadow-md"
+                style={{ background: avatarColor.bg, color: avatarColor.text }}>
                 {initials}
               </div>
               <h1 className="text-xl font-bold text-gray-900 text-center">{author.name}</h1>
               <p className="text-[#FF6B2B] text-sm font-medium mt-1">{author.nationality}</p>
             </div>
 
-            {/* Quick details */}
             <div className="space-y-3 mb-6">
               {[
                 { label: "Famous For", value: author.famousFor },
                 { label: "Genre", value: author.genre.join(", ") },
                 ...(author.born ? [{ label: "Born", value: author.born + (author.died ? ` — ${author.died}` : "") }] : []),
-                { label: "Books on Site", value: `${authorBooks.length} audiobook${authorBooks.length > 1 ? "s" : ""}` },
+                { label: "Books on Site", value: `${authorBooks.length} audiobook${authorBooks.length !== 1 ? "s" : ""}` },
               ].map((item) => (
                 <div key={item.label}>
                   <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">{item.label}</p>
@@ -113,16 +95,15 @@ export default function AuthorPage({ params }: Props) {
               ))}
             </div>
 
-            {/* Genre badges */}
             <div className="flex flex-wrap gap-2 mb-4">
               {author.genre.map((g) => (
-                <span key={g} className="bg-[#FFF1EB] text-[#E85A1A] text-xs font-semibold px-3 py-1 rounded-full">
+                <span key={g} className="text-xs font-semibold px-3 py-1 rounded-full"
+                  style={{ background: "#FFF1EB", color: "#E85A1A" }}>
                   {g}
                 </span>
               ))}
             </div>
 
-            {/* Wikipedia link */}
             {author.wikipedia && (
               <a href={author.wikipedia} target="_blank" rel="noopener noreferrer nofollow"
                 className="flex items-center gap-2 text-gray-400 hover:text-[#FF6B2B] text-xs transition-colors">
@@ -135,14 +116,10 @@ export default function AuthorPage({ params }: Props) {
           </div>
         </div>
 
-        {/* ── RIGHT: Bio + Books ── */}
+        {/* Right: Bio + Books */}
         <div className="lg:col-span-2 space-y-8">
-
-          {/* Full Bio — SEO content */}
           <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900 mb-5">
-              {author.name} ke baare mein
-            </h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-5">{author.name} ke baare mein</h2>
             <div className="text-gray-700 leading-relaxed space-y-4">
               {author.fullBio.split("\n\n").map((para, i) => (
                 <p key={i}>{para}</p>
@@ -150,7 +127,6 @@ export default function AuthorPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Author's Audiobooks */}
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-5">
               🎧 {author.name} ki Hindi Audiobooks ({authorBooks.length})
@@ -168,7 +144,7 @@ export default function AuthorPage({ params }: Props) {
             )}
           </div>
 
-          {/* SEO: Related Authors */}
+          {/* Related authors */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
             <h3 className="font-bold text-gray-900 mb-4">Similar Authors ke Audiobooks</h3>
             <div className="flex flex-wrap gap-3">
@@ -177,8 +153,8 @@ export default function AuthorPage({ params }: Props) {
                 .slice(0, 6)
                 .map((a) => (
                   <Link key={a.slug} href={`/author/${a.slug}`}
-                    className="flex items-center gap-2 bg-gray-50 hover:bg-[#FFF1EB] border border-gray-100 hover:border-[rgba(255,107,43,0.3)] text-gray-700 hover:text-[#E85A1A] text-sm font-medium px-3 py-2 rounded-xl transition-all">
-                    <span className="w-6 h-6 bg-[#FFF1EB] rounded-full flex items-center justify-center text-xs font-bold text-[#E85A1A]">
+                    className="flex items-center gap-2 bg-gray-50 hover:bg-[#FFF1EB] border border-gray-100 hover:border-[rgba(255,107,43,0.3)] text-gray-700 hover:text-[#FF6B2B] text-sm font-medium px-3 py-2 rounded-xl transition-all">
+                    <span className="w-6 h-6 bg-[#FFF1EB] rounded-full flex items-center justify-center text-xs font-bold text-[#FF6B2B]">
                       {a.name.split(" ")[0][0]}
                     </span>
                     {a.name}
@@ -186,7 +162,6 @@ export default function AuthorPage({ params }: Props) {
                 ))}
             </div>
           </div>
-
         </div>
       </div>
     </div>
