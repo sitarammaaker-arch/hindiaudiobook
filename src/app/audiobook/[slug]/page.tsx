@@ -8,6 +8,7 @@ import GoogleAd from "@/components/GoogleAd";
 import StarRating from "@/components/StarRating";
 import LiteYouTube from "@/components/LiteYouTube";
 import StickyPlayer from "@/components/StickyPlayer";
+import YouTubeViewCount from "@/components/YouTubeViewCount";
 import TrackVisit from "@/components/TrackVisit";
 import RecentlyListened from "@/components/RecentlyListened";
 import { getAllAudiobooks, getBookBySlug, getRelatedBooks, categories } from "@/lib/data";
@@ -140,7 +141,7 @@ export default async function AudiobookDetailPage({ params }: Props) {
           {/* Book meta badges */}
           <div className="flex flex-wrap gap-2">
             <span className="bg-gray-100 text-gray-600 text-xs font-medium px-3 py-1.5 rounded-full">⏱ {book.duration}</span>
-            <span className="bg-gray-100 text-gray-600 text-xs font-medium px-3 py-1.5 rounded-full">👁 {((book.plays||0) / 1000).toFixed(0)}K plays</span>
+            <YouTubeViewCount videoId={book.videoId} />
             <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full">🆓 Free</span>
             {hasDirectAudio && <span className="bg-[#FFF1EB] text-[#E85A1A] text-xs font-bold px-3 py-1.5 rounded-full">🔒 Lock Screen ✅</span>}
             {book.trending && <span className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full">🔥 Trending</span>}

@@ -947,6 +947,31 @@ export default function UploadPage() {
                 🌱 Seed Original 9 Authors
               </button>
             </div>
+
+            {/* YouTube Views Refresh */}
+            <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
+              <p className="text-gray-500 text-sm mb-1">YouTube se real view counts fetch karo</p>
+              <p className="text-xs text-gray-400 mb-3">Auto-refresh: Roz 7:30 AM IST — Ya manually refresh karein</p>
+              <button
+                onClick={async () => {
+                  setAuthStatus({ type: "loading", message: "YouTube se views fetch ho rahi hain..." });
+                  try {
+                    const res = await fetch("/api/refresh-views");
+                    const d = await res.json();
+                    if (d.success) {
+                      setAuthStatus({ type: "success", message: `✅ ${d.message} — Updated: ${new Date(d.updatedAt).toLocaleString("hi-IN")}` });
+                    } else {
+                      setAuthStatus({ type: "error", message: d.error || "Refresh failed" });
+                    }
+                  } catch {
+                    setAuthStatus({ type: "error", message: "Network error" });
+                  }
+                }}
+                className="text-sm font-semibold px-6 py-2 rounded-xl border-2 transition-colors"
+                style={{ borderColor: "#FF0000", color: "#FF0000" }}>
+                📺 YouTube Views Refresh Karo
+              </button>
+            </div>
           </div>
         )}
 
