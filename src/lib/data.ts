@@ -1,12 +1,12 @@
 // ── Unified Data Layer ─────────────────────────────────────────────────────
 // Single source of truth for ALL pages
-// static audiobooks.ts + KV uploaded books = MERGED everywhere
 
-import { readJSONAsync, getAllPlays } from "./db";
+import { readJSONAsync, getAllPlays, getAllAuthorsFromKV, saveAllAuthors } from "./db";
 import { audiobooks as staticBooks, categories, type Audiobook } from "@/data/audiobooks";
 import { chapterBooks as staticChapterBooks, type ChapterBook } from "@/data/chapters";
+import { SEED_AUTHORS, type Author } from "@/data/authors";
 
-// ── Core fetch ─────────────────────────────────────────────────────────────
+// ── Audiobooks ─────────────────────────────────────────────────────────────
 export async function getAllAudiobooks(): Promise<Audiobook[]> {
   try {
     const [dynamic, plays] = await Promise.all([
@@ -60,7 +60,6 @@ export async function getRelatedBooks(slug: string, category: string, limit = 4)
   return all.filter((b) => b.category === category && b.slug !== slug).slice(0, limit);
 }
 
-// Category counts — for homepage category section
 export async function getCategoryCounts(): Promise<Record<string, number>> {
   const all = await getAllAudiobooks();
   const counts: Record<string, number> = {};
@@ -71,18 +70,11 @@ export async function getCategoryCounts(): Promise<Record<string, number>> {
   return counts;
 }
 
-export { categories };
-export type { Audiobook, ChapterBook };
-
-import { getAllAuthorsFromKV, saveAllAuthors } from "./db";
-import { SEED_AUTHORS, type Author } from "@/data/authors";
-
+// ── Authors ────────────────────────────────────────────────────────────────
 export async function getAllAuthors(): Promise<Author[]> {
   try {
     const kvAuthors = await getAllAuthorsFromKV();
-    if (kvAuthors !== null) {
-      return kvAuthors as Author[];
-    }
+    if (kvAuthors !== null) return kvAuthors as Author[];
     // First time — auto-seed KV with static authors
     await saveAllAuthors(SEED_AUTHORS);
     return SEED_AUTHORS;
@@ -90,3 +82,7 @@ export async function getAllAuthors(): Promise<Author[]> {
     return SEED_AUTHORS;
   }
 }
+
+// ── Re-exports ─────────────────────────────────────────────────────────────
+export { categories };
+export type { Audiobook, ChapterBook, Author };
