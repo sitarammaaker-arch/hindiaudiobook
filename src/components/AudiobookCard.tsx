@@ -18,7 +18,7 @@ function buildThumbCandidates(audiobook: Audiobook): string[] {
   }
 
   // Remove duplicates while preserving order
-  return [...new Set(candidates.filter(Boolean))];
+  return candidates.filter((value, index, arr) => Boolean(value) && arr.indexOf(value) === index);
 }
 
 export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
