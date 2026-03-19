@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Audiobook, categories } from "@/data/audiobooks";
 import { makeSlug } from "@/lib/utils";
