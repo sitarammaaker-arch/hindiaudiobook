@@ -7,6 +7,7 @@ import AudioPlayer from "@/components/AudioPlayer";
 import GoogleAd from "@/components/GoogleAd";
 import StarRating from "@/components/StarRating";
 import LiteYouTube from "@/components/LiteYouTube";
+import StickyPlayer from "@/components/StickyPlayer";
 import { getAllAudiobooks, getBookBySlug, getRelatedBooks, categories } from "@/lib/data";
 import { makeSlug } from "@/lib/utils";
 
@@ -43,6 +44,7 @@ export default async function AudiobookDetailPage({ params }: Props) {
   if (!book) notFound();
 
   const related = await getRelatedBooks(book.slug, book.category);
+  const nextBook = related[0] || null; // First related = next book suggestion
   const categorySlug = book.category?.trim() || "";
   const category = categories.find((c) => c.slug === categorySlug);
   const hasDirectAudio = Boolean(book.audioUrl?.trim());
@@ -259,6 +261,34 @@ export default async function AudiobookDetailPage({ params }: Props) {
           </div>
         </section>
       )}
+
+      {/* Next Book CTA banner */}
+      {nextBook && (
+        <div className="mt-10 rounded-2xl p-5 flex items-center gap-4 border"
+          style={{ background: "#FFF8F5", borderColor: "rgba(255,107,43,0.2)" }}>
+          <div className="w-16 h-12 rounded-xl overflow-hidden flex-shrink-0"
+            style={{ background: `url(${nextBook.thumbnail}) center/cover, #1A1A2E` }} />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-gray-500 mb-0.5">Aage sunein 👇</p>
+            <p className="font-bold text-gray-900 text-sm line-clamp-1">{nextBook.title}</p>
+          </div>
+          <Link href={`/audiobook/${nextBook.slug}`}
+            className="flex-shrink-0 font-bold text-white text-sm px-5 py-2.5 rounded-xl transition-colors shadow-md"
+            style={{ background: "#FF6B2B" }}>
+            Next ▶
+          </Link>
+        </div>
+      )}
+
+      {/* Sticky bottom player — appears on scroll */}
+      <StickyPlayer
+        videoId={book.videoId}
+        title={book.title}
+        author={authorName}
+        thumbnail={book.thumbnail}
+        slug={book.slug}
+        nextBook={nextBook ? { slug: nextBook.slug, title: nextBook.title, thumbnail: nextBook.thumbnail } : null}
+      />
     </div>
   );
 }

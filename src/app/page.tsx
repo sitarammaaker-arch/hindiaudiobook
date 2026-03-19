@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AudiobookCard from "@/components/AudiobookCard";
+import GoogleAd from "@/components/GoogleAd";
 import {
   getAllAudiobooks, getAllChapterBooks, getCategoryCounts, categories,
   type Audiobook, type ChapterBook,
@@ -113,6 +114,9 @@ export default async function HomePage() {
             </div>
           </section>
         )}
+
+        {/* ── Ad between sections ── */}
+        <GoogleAd slot="1122334455" />
 
         {/* ── Latest ── */}
         {latest.length > 0 && (

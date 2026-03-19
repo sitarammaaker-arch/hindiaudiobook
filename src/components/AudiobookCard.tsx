@@ -1,38 +1,58 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Audiobook, categories } from "@/data/audiobooks";
 import { makeSlug } from "@/lib/utils";
+
+// Read rating from localStorage
+function getAvgRating(slug: string): { avg: number; total: number } | null {
+  try {
+    const seeds: Record<string, { total: number; score: number }> = {
+      "trading-in-the-zone-full-hindi-audiobook":    { total: 203, score: 940 },
+      "the-disciplined-trader-hindi-audiobook":       { total: 247, score: 1141 },
+      "the-intelligent-investor-hindi-audiobook":     { total: 178, score: 818 },
+      "rich-dad-poor-dad-hindi-audiobook":            { total: 412, score: 1895 },
+      "48-laws-of-power-hindi-audiobook":             { total: 334, score: 1503 },
+      "atomic-habits-hindi-audiobook":                { total: 445, score: 2047 },
+      "the-alchemist-hindi-audiobook":                { total: 389, score: 1790 },
+      "think-and-grow-rich-hindi-audiobook":          { total: 312, score: 1434 },
+      "bhagawad-geeta-hindi-audiobook":               { total: 521, score: 2424 },
+      "zero-to-one-hindi-audiobook":                  { total: 134, score: 590 },
+    };
+    const stored = localStorage.getItem(`rating_${slug}`);
+    if (stored) {
+      const d = JSON.parse(stored);
+      if (d.totalRatings > 0) return { avg: d.avgRating, total: d.totalRatings };
+    }
+    const seed = seeds[slug];
+    if (seed) return { avg: Math.round((seed.score / seed.total) * 10) / 10, total: seed.total };
+    return null;
+  } catch { return null; }
+}
 
 export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
   const category = categories.find((c) => c.slug === audiobook.category?.trim());
   const authorName = audiobook.author?.replace(/^by\s+/i, "") || audiobook.author || "";
   const authorSlug = makeSlug(authorName);
+  const [rating, setRating] = useState<{ avg: number; total: number } | null>(null);
+
+  useEffect(() => {
+    setRating(getAvgRating(audiobook.slug));
+  }, [audiobook.slug]);
 
   return (
     <Link href={`/audiobook/${audiobook.slug}`} className="group block">
       <div className="card overflow-hidden bg-white" style={{ borderRadius: "16px" }}>
 
-        {/* Thumbnail — CSS background, no JS event handlers */}
-        <div className="relative overflow-hidden"
-          style={{ aspectRatio: "16/9", background: "#1A1A2E" }}>
-
-          {/* Fallback icon */}
+        {/* Thumbnail */}
+        <div className="relative overflow-hidden" style={{ aspectRatio: "16/9", background: "#1A1A2E" }}>
           <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 0 }}>
             <span style={{ fontSize: "2rem", opacity: 0.3 }}>🎧</span>
           </div>
-
-          {/* Thumbnail via CSS background */}
           {audiobook.thumbnail && (
             <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105"
-              style={{
-                backgroundImage: `url(${audiobook.thumbnail})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                zIndex: 1,
-              }} />
+              style={{ backgroundImage: `url(${audiobook.thumbnail})`, backgroundSize: "cover", backgroundPosition: "center", zIndex: 1 }} />
           )}
-
-          {/* Play overlay */}
           <div className="absolute inset-0 transition-opacity duration-300 opacity-0 group-hover:opacity-100 flex items-center justify-center"
             style={{ background: "rgba(26,26,46,0.35)", zIndex: 2 }}>
             <div className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
@@ -42,22 +62,16 @@ export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
               </svg>
             </div>
           </div>
-
-          {/* Duration */}
           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded-lg"
             style={{ zIndex: 3, fontFamily: "var(--font-inter)" }}>
             {audiobook.duration}
           </div>
-
-          {/* Category badge */}
           {category && (
             <div className="absolute top-2 left-2 bg-white/95 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm max-w-[140px] truncate"
               style={{ color: "#1A1A2E", fontFamily: "var(--font-inter)", zIndex: 3 }}>
               {category.emoji} {category.label}
             </div>
           )}
-
-          {/* Trending */}
           {audiobook.trending && (
             <div className="absolute top-2 right-2 text-xs font-bold px-2 py-1 rounded-full"
               style={{ background: "#FF6B2B", color: "white", zIndex: 3 }}>
@@ -72,9 +86,7 @@ export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
             style={{ letterSpacing: "-0.01em" }}>
             {audiobook.title}
           </h3>
-
-          {/* Author — plain link, no JS event handlers */}
-          <p className="text-xs mb-3" style={{ color: "#9CA3AF", fontFamily: "var(--font-inter)" }}>
+          <p className="text-xs mb-2" style={{ color: "#9CA3AF", fontFamily: "var(--font-inter)" }}>
             by{" "}
             <Link href={`/author/${authorSlug}`}
               onClick={(e) => e.stopPropagation()}
@@ -82,6 +94,15 @@ export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
               {authorName}
             </Link>
           </p>
+
+          {/* Star rating on card */}
+          {rating && (
+            <div className="flex items-center gap-1 mb-2">
+              <span className="text-yellow-400 text-xs">{"★".repeat(Math.round(rating.avg))}{"☆".repeat(5 - Math.round(rating.avg))}</span>
+              <span className="text-xs font-medium text-gray-600">{rating.avg.toFixed(1)}</span>
+              <span className="text-xs text-gray-400">({rating.total > 999 ? (rating.total/1000).toFixed(1)+"K" : rating.total})</span>
+            </div>
+          )}
 
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 text-xs" style={{ color: "#9CA3AF" }}>
