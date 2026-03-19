@@ -9,11 +9,19 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const [allBooks, chapterBooks, catCounts] = await Promise.all([
-    getAllAudiobooks(),
-    getAllChapterBooks(),
-    getCategoryCounts(),
-  ]);
+  let allBooks: Audiobook[] = [];
+  let chapterBooks: ChapterBook[] = [];
+  let catCounts: Record<string, number> = {};
+
+  try {
+    [allBooks, chapterBooks, catCounts] = await Promise.all([
+      getAllAudiobooks(),
+      getAllChapterBooks(),
+      getCategoryCounts(),
+    ]);
+  } catch {
+    // Silent fallback — empty arrays, page still renders
+  }
 
   const trending = allBooks.filter((b) => b.trending).sort((a, b) => (b.plays||0) - (a.plays||0)).slice(0, 9);
   const latest   = allBooks.filter((b) => b.latest).sort((a, b) => (b.plays||0) - (a.plays||0)).slice(0, 6);
