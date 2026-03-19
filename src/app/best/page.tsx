@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { curatedLists } from "@/data/curated-lists";
-import { audiobooks } from "@/data/audiobooks";
+import { getAllAudiobooks } from "@/lib/data";
+import { type Audiobook } from "@/data/audiobooks";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Best Hindi Audiobooks Lists — Top Curated Collections | HindiAudiobook.com",
@@ -9,7 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.hindiaudiobook.com/best" },
 };
 
-export default function BestListsPage() {
+export default async function BestListsPage() {
+  const allBooks = await getAllAudiobooks();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
@@ -26,13 +32,12 @@ export default function BestListsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {curatedLists.map((list) => {
           const books = list.books
-            .map((slug) => audiobooks.find((b) => b.slug === slug))
-            .filter(Boolean);
+            .map((slug) => allBooks.find((b) => b.slug === slug))
+            .filter(Boolean) as Audiobook[];
 
           return (
             <Link key={list.slug} href={`/best/${list.slug}`}
               className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-[rgba(255,107,43,0.3)] hover:shadow-xl shadow-sm transition-all duration-300 hover:-translate-y-1">
-              {/* Gradient header */}
               <div className="p-6 text-white"
                 style={{ background: `linear-gradient(135deg, ${list.bgFrom}, ${list.bgTo})` }}>
                 <div className="text-4xl mb-3">{list.emoji}</div>
