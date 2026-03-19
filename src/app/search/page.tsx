@@ -67,7 +67,7 @@ export default function SearchPage() {
     // Sort
     if (sortBy === "popular") return [...books].sort((a, b) => (b.plays || 0) - (a.plays || 0));
     if (sortBy === "newest") return [...books].sort((a, b) =>
-      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      new Date((b as any).createdAt || 0).getTime() - new Date((a as any).createdAt || 0).getTime()
     );
     return books;
   }, [query, allBooks, activeCategory, duration, sortBy]);
