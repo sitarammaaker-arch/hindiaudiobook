@@ -8,7 +8,7 @@ import type { Author } from "@/data/authors";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const dynamicParams = true; // naye KV authors ke liye bhi page render hoga
+export const dynamicParams = true;
 
 interface Props { params: { slug: string } }
 
@@ -40,11 +40,21 @@ export default async function AuthorPage({ params }: Props) {
   const author = authors.find((a: Author) => a.slug === params.slug);
   if (!author) notFound();
 
-  // Books by this author — match by slug list OR by author name
-  const authorBooks = allBooks.filter((b) =>
-    author.books?.includes(b.slug) ||
-    b.author?.replace(/^by\s+/i, "").toLowerCase() === author.name.toLowerCase()
-  );
+  // Auto-match books — 3 ways:
+  // 1. Author ke books[] array mein slug match
+  // 2. Book ke author field mein exact name match
+  // 3. Book ke author field mein partial last name match (e.g. "Douglas" matches "Mark Douglas")
+  const authorNameLower = author!.name.toLowerCase();
+  const authorLastName = author!.name.split(" ").pop()?.toLowerCase() || "";
+
+  const authorBooks = allBooks.filter((b) => {
+    const bookAuthor = b.author?.replace(/^by\s+/i, "").toLowerCase().trim() || "";
+    return (
+      author!.books?.includes(b.slug) ||
+      bookAuthor === authorNameLower ||
+      (authorLastName.length > 3 && bookAuthor.includes(authorLastName))
+    );
+  });
 
   const initials = author.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
   const avatarColor = avatarColors[author.slug] ?? { bg: "#F1EFE8", text: "#5F5E5A" };

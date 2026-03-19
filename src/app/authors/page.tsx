@@ -30,10 +30,16 @@ export default async function AuthorsPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {authors.map((author) => {
-          const bookCount = allBooks.filter((b) =>
-            author.books?.includes(b.slug) ||
-            b.author?.replace(/^by\s+/i, "").toLowerCase() === author.name.toLowerCase()
-          ).length;
+          const authorNameLower = author.name.toLowerCase();
+          const authorLastName = author.name.split(" ").pop()?.toLowerCase() || "";
+          const bookCount = allBooks.filter((b) => {
+            const bookAuthor = b.author?.replace(/^by\s+/i, "").toLowerCase().trim() || "";
+            return (
+              author.books?.includes(b.slug) ||
+              bookAuthor === authorNameLower ||
+              (authorLastName.length > 3 && bookAuthor.includes(authorLastName))
+            );
+          }).length;
           const initials = author.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
           return (
             <Link key={author.slug} href={`/author/${author.slug}`}
