@@ -7,7 +7,7 @@ import { getAllAuthors, getAllAudiobooks } from "@/lib/data";
 import type { Author } from "@/data/authors";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 1800; // ISR: 30 min
 export const dynamicParams = true;
 
 interface Props { params: { slug: string } }

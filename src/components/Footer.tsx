@@ -27,15 +27,16 @@ export default function Footer() {
               <span className="text-xs" style={{ color: "rgba(255,107,43,0.7)" }}>www.HindiAudiobook.com</span>
             </p>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               {[
-                { label: "YouTube", href: "https://youtube.com/@hindiaudiobook" },
-                { label: "Telegram", href: "#" },
-                { label: "Instagram", href: "#" },
+                { label: "YouTube", href: "https://youtube.com/@hindiaudiobook", color: "#FF0000" },
+                { label: "WhatsApp", href: "https://whatsapp.com/channel/0029VaFSHSB1dAw9L0JBGn0P", color: "#25D366" },
+                { label: "Telegram", href: "#", color: "#2CA5E0" },
+                { label: "Instagram", href: "#", color: "#E1306C" },
               ].map((s) => (
                 <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-                  className="nav-social text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-                  style={{ background: "rgba(255,255,255,0.08)", color: "#9CA3AF" }}>
+                  className="text-xs font-medium px-3 py-1.5 rounded-lg transition-all hover:opacity-90"
+                  style={{ background: s.color + "22", color: s.color, border: `1px solid ${s.color}33` }}>
                   {s.label}
                 </a>
               ))}

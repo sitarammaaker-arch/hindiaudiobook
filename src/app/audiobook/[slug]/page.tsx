@@ -6,7 +6,7 @@ import AudiobookCard from "@/components/AudiobookCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import GoogleAd from "@/components/GoogleAd";
 import StarRating from "@/components/StarRating";
-import YouTubePlayTracker from "@/components/YouTubePlayTracker";
+import LiteYouTube from "@/components/LiteYouTube";
 import { getAllAudiobooks, getBookBySlug, getRelatedBooks, categories } from "@/lib/data";
 import { makeSlug } from "@/lib/utils";
 
@@ -113,17 +113,8 @@ export default async function AudiobookDetailPage({ params }: Props) {
           {hasDirectAudio ? (
             <AudioPlayer audioUrl={book.audioUrl} title={book.title} author={authorName} thumbnail={book.thumbnail} duration={book.duration} slug={book.slug} />
           ) : (
-            <div className="rounded-2xl overflow-hidden bg-black">
-              <YouTubePlayTracker slug={book.slug} />
-              <div className="aspect-video">
-                <iframe
-                  width="100%" height="100%"
-                  src={`https://www.youtube.com/embed/${book.videoId}?rel=0&modestbranding=1`}
-                  title={`${book.title} — Hindi Audiobook`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen className="w-full h-full"
-                />
-              </div>
+            <div className="rounded-2xl overflow-hidden bg-black shadow-xl">
+              <LiteYouTube videoId={book.videoId} title={`${book.title} — Hindi Audiobook`} />
             </div>
           )}
 
@@ -175,6 +166,27 @@ export default async function AudiobookDetailPage({ params }: Props) {
               <h2 className="text-xl font-bold text-gray-900 mb-4">📖 {book.title} — Hindi Audiobook ke Baare Mein</h2>
               <div className="text-gray-700 leading-relaxed space-y-3 text-sm">
                 {book.description.split("\n\n").map((para, i) => <p key={i}>{para}</p>)}
+              </div>
+              {/* Internal links — SEO + UX */}
+              <div className="mt-5 pt-5 border-t border-gray-100">
+                <p className="text-xs text-gray-500 mb-3 font-medium">Aur explore karein:</p>
+                <div className="flex flex-wrap gap-2">
+                  {category && (
+                    <Link href={`/category/${book.category}`}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
+                      style={{ background: "#FFF1EB", color: "#FF6B2B" }}>
+                      {category.emoji} Aur {category.label} Audiobooks →
+                    </Link>
+                  )}
+                  <Link href={`/author/${makeSlug(authorName)}`}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    ✍️ {authorName} ki aur books →
+                  </Link>
+                  <Link href="/free-hindi-audiobooks"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    🎧 Saari Free Audiobooks →
+                  </Link>
+                </div>
               </div>
             </div>
           )}

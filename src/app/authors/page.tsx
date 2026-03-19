@@ -4,7 +4,7 @@ import { getAllAuthors } from "@/lib/data";
 import { getAllAudiobooks } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 1800; // ISR: 30 min
 
 export const metadata: Metadata = {
   title: "Hindi Audiobook Authors — Sabhi Lekhak | HindiAudiobook.com",

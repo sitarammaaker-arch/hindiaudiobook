@@ -5,7 +5,7 @@ import { getAllAudiobooks } from "@/lib/data";
 import { type Audiobook } from "@/data/audiobooks";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 1800; // ISR: 30 min
 
 export const metadata: Metadata = {
   title: "Best Hindi Audiobooks Lists — Top Curated Collections | HindiAudiobook.com",
