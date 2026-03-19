@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     const books = await readJSONAsync<{ videoId: string; slug: string }>("audiobooks.json");
     if (books.length === 0) return NextResponse.json({ success: false, message: "No books" });
 
-    const uniqueIds = [...new Set(books.map((b) => b.videoId).filter(Boolean))];
+    const uniqueIds = Array.from(new Set(books.map((b) => b.videoId).filter(Boolean)));
     let allViews: Record<string, number> = {};
     for (let i = 0; i < uniqueIds.length; i += 50) {
       const batch = uniqueIds.slice(i, i + 50);
