@@ -4,18 +4,13 @@ import Link from "next/link";
 import Script from "next/script";
 import AudiobookCard from "@/components/AudiobookCard";
 import { getAllAuthors, getAllAudiobooks } from "@/lib/data";
-import { authors as staticAuthors } from "@/data/authors";
 import type { Author } from "@/data/authors";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+export const dynamicParams = true; // naye KV authors ke liye bhi page render hoga
 
 interface Props { params: { slug: string } }
-
-// generateStaticParams — static authors only (uploaded authors handled by dynamic)
-export async function generateStaticParams() {
-  return staticAuthors.map((a) => ({ slug: a.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const authors = await getAllAuthors();
