@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Audiobook, categories } from "@/data/audiobooks";
-import { makeSlug } from "@/lib/db";
+import { makeSlug } from "@/lib/utils";
 
 export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
   const category = categories.find((c) => c.slug === audiobook.category?.trim());

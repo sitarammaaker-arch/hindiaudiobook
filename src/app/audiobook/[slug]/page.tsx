@@ -8,7 +8,7 @@ import GoogleAd from "@/components/GoogleAd";
 import StarRating from "@/components/StarRating";
 import YouTubePlayTracker from "@/components/YouTubePlayTracker";
 import { getAllAudiobooks, getBookBySlug, getRelatedBooks, categories } from "@/lib/data";
-import { makeSlug } from "@/lib/db";
+import { makeSlug } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
