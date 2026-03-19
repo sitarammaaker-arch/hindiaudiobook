@@ -12,6 +12,7 @@ export type Audiobook = {
   latest?: boolean;
   plays: number;
   audioUrl: string;
+  createdAt?: string;
 };
 
 export const audiobooks: Audiobook[] = [
