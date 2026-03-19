@@ -5,27 +5,22 @@ import { makeSlug } from "@/lib/utils";
 export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
   const category = categories.find((c) => c.slug === audiobook.category?.trim());
   const authorName = audiobook.author?.replace(/^by\s+/i, "") || audiobook.author || "";
+  const authorSlug = makeSlug(authorName);
 
   return (
     <Link href={`/audiobook/${audiobook.slug}`} className="group block">
       <div className="card overflow-hidden bg-white" style={{ borderRadius: "16px" }}>
 
-        {/* Thumbnail — no onError handler (Server Component compatible) */}
+        {/* Thumbnail — CSS background, no JS event handlers */}
         <div className="relative overflow-hidden"
-          style={{
-            aspectRatio: "16/9",
-            background: audiobook.thumbnail
-              ? `url(${audiobook.thumbnail}) center/cover, #1A1A2E`
-              : "#1A1A2E",
-          }}>
+          style={{ aspectRatio: "16/9", background: "#1A1A2E" }}>
 
-          {/* Fallback icon — shows if image fails to load via CSS */}
-          <div className="absolute inset-0 flex items-center justify-center"
-            style={{ zIndex: 0 }}>
+          {/* Fallback icon */}
+          <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 0 }}>
             <span style={{ fontSize: "2rem", opacity: 0.3 }}>🎧</span>
           </div>
 
-          {/* Image via CSS background — no JS event handlers needed */}
+          {/* Thumbnail via CSS background */}
           {audiobook.thumbnail && (
             <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105"
               style={{
@@ -33,8 +28,7 @@ export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 zIndex: 1,
-              }}
-            />
+              }} />
           )}
 
           {/* Play overlay */}
@@ -77,19 +71,17 @@ export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
             style={{ letterSpacing: "-0.01em" }}>
             {audiobook.title}
           </h3>
+
+          {/* Author — plain link, no JS event handlers */}
           <p className="text-xs mb-3" style={{ color: "#9CA3AF", fontFamily: "var(--font-inter)" }}>
             by{" "}
-            <span onClick={(e) => e.preventDefault()}
-              className="hover:text-[#FF6B2B] transition-colors"
-              style={{ cursor: "pointer" }}
-              onClickCapture={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                window.location.href = `/author/${makeSlug(authorName)}`;
-              }}>
+            <Link href={`/author/${authorSlug}`}
+              onClick={(e) => e.stopPropagation()}
+              className="hover:text-[#FF6B2B] transition-colors">
               {authorName}
-            </span>
+            </Link>
           </p>
+
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 text-xs" style={{ color: "#9CA3AF" }}>
               <span className="flex items-end gap-px" style={{ height: "12px" }}>
