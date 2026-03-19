@@ -16,7 +16,7 @@ export const revalidate = 0;
 interface Props { params: { slug: string } }
 
 export async function generateStaticParams() {
-  return audiobooks.map((a) => ({ slug: a.slug }));
+  return []; // Sab books KV se hain — build time par koi static slugs nahi
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
