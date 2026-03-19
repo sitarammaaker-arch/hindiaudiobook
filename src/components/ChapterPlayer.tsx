@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
+
 import { Chapter, ChapterBook } from "@/data/chapters";
 
 interface ChapterPlayerProps {
@@ -276,7 +276,7 @@ export default function ChapterPlayer({
       {/* Chapter info */}
       <div className="flex items-center gap-3 mb-5">
         <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 shadow-lg ring-2 ring-white/20">
-          <Image src={chapter.thumbnail} alt={chapter.title} fill className="object-cover" sizes="56px" />
+          <img src={chapter.thumbnail} alt={chapter.title} className="w-full h-full object-cover" loading="lazy" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">

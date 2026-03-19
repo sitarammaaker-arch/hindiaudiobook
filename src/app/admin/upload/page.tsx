@@ -107,7 +107,7 @@ export default function UploadPage() {
 
   // ── Audiobook form state ──────────────────────────────────────────────────
   const [ab, setAb] = useState({
-    title: "", author: "", category: "self-help", duration: "",
+    title: "", author: "", category: "motivational", duration: "",
     videoId: "", audioUrl: "", description: "", trending: false, latest: true,
   });
   const [abStatus, setAbStatus] = useState<Status>({ type: "idle", message: "" });
@@ -116,7 +116,7 @@ export default function UploadPage() {
 
   // ── New Book form state ───────────────────────────────────────────────────
   const [bk, setBk] = useState({
-    title: "", author: "", category: "self-help", totalDuration: "",
+    title: "", author: "", category: "motivational", totalDuration: "",
     description: "", trending: false, latest: true, videoId: "",
   });
   const [bkStatus, setBkStatus] = useState<Status>({ type: "idle", message: "" });
@@ -216,7 +216,7 @@ export default function UploadPage() {
       const data = await res.json();
       if (data.success) {
         setAbStatus({ type: "success", message: `"${ab.title}" successfully add ho gaya! 🎉` });
-        setAb({ title: "", author: "", category: "self-help", duration: "", videoId: "", audioUrl: "", description: "", trending: false, latest: true });
+        setAb({ title: "", author: "", category: "motivational", duration: "", videoId: "", audioUrl: "", description: "", trending: false, latest: true });
         setAbThumb(""); setShowAbFetcher(false);
       } else {
         setAbStatus({ type: "error", message: data.error || "Upload fail hua" });
@@ -239,7 +239,7 @@ export default function UploadPage() {
       const data = await res.json();
       if (data.success) {
         setBkStatus({ type: "success", message: `"${bk.title}" create ho gayi! Ab "Chapter Add" tab se chapters add karein. 📚` });
-        setBk({ title: "", author: "", category: "self-help", totalDuration: "", description: "", trending: false, latest: true, videoId: "" });
+        setBk({ title: "", author: "", category: "motivational", totalDuration: "", description: "", trending: false, latest: true, videoId: "" });
         setShowBkFetcher(false);
         loadData();
       } else {

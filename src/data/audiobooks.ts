@@ -12,7 +12,6 @@ export type Audiobook = {
   latest?: boolean;
   plays: number;
   audioUrl: string;
-  createdAt?: string;
 };
 
 export const audiobooks: Audiobook[] = [
@@ -21,8 +20,8 @@ export const audiobooks: Audiobook[] = [
     id: 1,
     title: "The Disciplined Trader Hindi Audiobook",
     slug: "the-disciplined-trader-hindi",
-    videoId: "zx3P8Q-0PzM",
-    thumbnail: "https://img.youtube.com/vi/zx3P8Q-0PzM/hqdefault.jpg",
+    videoId: "Ks-_Mh1QhMc",
+    thumbnail: "https://img.youtube.com/vi/Ks-_Mh1QhMc/hqdefault.jpg",
     duration: "4h 10m",
     category: "trading-psychology",
     author: "Mark Douglas",

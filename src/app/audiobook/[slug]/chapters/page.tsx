@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+
 import { chapterBooks, getChapterBookBySlug, getTotalFreeChapters } from "@/data/chapters";
 import { categories } from "@/data/audiobooks";
 
@@ -54,7 +54,7 @@ export default function ChapterBookPage({ params }: Props) {
         <div className="relative flex flex-col sm:flex-row gap-6 items-start">
           {/* Thumbnail */}
           <div className="relative w-36 h-28 sm:w-44 sm:h-32 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0">
-            <Image src={book.thumbnail} alt={book.title} fill className="object-cover" sizes="176px" />
+            <img src={book.thumbnail} alt={book.title} className="w-full h-full object-cover" loading="lazy" />
           </div>
           {/* Info */}
           <div className="flex-1">

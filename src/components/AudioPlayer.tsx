@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
-import Image from "next/image";
+
 
 interface AudioPlayerProps {
   audioUrl: string;
@@ -316,7 +316,7 @@ export default function AudioPlayer({
       {/* Top: thumbnail + info */}
       <div className="flex items-center gap-4 mb-6">
         <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
-          <Image src={thumbnail} alt={title} fill className="object-cover" sizes="64px" />
+          <img src={thumbnail} alt={title} className="w-full h-full object-cover" loading="lazy" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-bold text-white text-sm leading-tight line-clamp-2">{title}</p>

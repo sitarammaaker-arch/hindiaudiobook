@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+
 import { chapterBooks, getTotalFreeChapters } from "@/data/chapters";
 import { categories } from "@/data/audiobooks";
 
@@ -46,12 +46,12 @@ export default function ChaptersPage() {
             <div key={book.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 hover:border-[rgba(255,107,43,0.3)] transition-all duration-300 hover:-translate-y-1 group">
               {/* Thumbnail */}
               <div className="relative aspect-video overflow-hidden bg-gray-200">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={book.thumbnail}
                   alt={book.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
                 />
                 <div className="absolute top-2 left-2 flex gap-1.5">
                   {category && (

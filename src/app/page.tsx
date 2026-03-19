@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+
 import Script from "next/script";
 import AudiobookCard from "@/components/AudiobookCard";
 import SearchBar from "@/components/SearchBar";
@@ -55,19 +55,9 @@ export default async function HomePage() {
   const allBooks     = await getAllAudiobooks();
   const chapterBooks = await getAllChapterBooks();
 
-  // Trending section honors admin checkbox first, then fills from play count.
-  const trendingSelected = allBooks.filter((b) => b.trending);
-  const trendingFallback = [...allBooks]
-    .filter((b) => !b.trending)
-    .sort((a, b) => (b.plays || 0) - (a.plays || 0));
-  const trending = [...trendingSelected, ...trendingFallback].slice(0, 6);
+  const trending = allBooks.filter((b) => b.trending);
+  const latest   = allBooks.filter((b) => b.latest).slice(0, 6);
 
-  // Latest section honors admin checkbox and shows newest uploads first.
-  const latest = [...allBooks]
-    .filter((b) => b.latest)
-    .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
-    .slice(0, 6);
-  
   // getTotalFreeChapters helper
   const getTotalFreeChapters = (book: any) =>
     book.chapters?.filter((c: any) => c.isFree)?.length ?? 0;
@@ -154,9 +144,9 @@ export default async function HomePage() {
 
         {/* ── Trending ── */}
         <section aria-label="Trending Hindi Audiobooks">
-          <SectionHeader title="🔥 Trending Hindi Audiobooks" subtitle="Admin panel mein Trending select kiye books yahan dikhte hain" />
+          <SectionHeader title="🔥 Trending Hindi Audiobooks" subtitle="Sabse zyada sune jaane wale hindi audio books" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trending.map((book) => (
+            {trending.slice(0, 6).map((book) => (
               <AudiobookCard key={book.id} audiobook={book} />
             ))}
           </div>
@@ -170,11 +160,11 @@ export default async function HomePage() {
           <SectionHeader title="🔍 Most Searched Hindi Audiobooks" subtitle="Google par sabse zyada dhundhe jaate hain" />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[
-              { title: "Disciplined Trader", slug: "the-disciplined-trader-hindi-audiobook",     emoji: "📈", desc: "Trading mindset" },
+              { title: "Disciplined Trader", slug: "the-disciplined-trader-hindi",     emoji: "📈", desc: "Trading mindset" },
               { title: "Market Wizards",     slug: "market-wizards-hindi",             emoji: "🧙", desc: "Trading legends" },
               { title: "48 Laws of Power",   slug: "48-laws-of-power-hindi",           emoji: "👑", desc: "Power & strategy" },
               { title: "Millionaire Mind",   slug: "secrets-of-millionaire-mind-hindi",emoji: "💰", desc: "Wealth mindset" },
-              { title: "Zero to One",        slug: "zero-to-one-hindi-audiobook",                emoji: "🚀", desc: "Startup thinking" },
+              { title: "Zero to One",        slug: "zero-to-one-hindi",                emoji: "🚀", desc: "Startup thinking" },
             ].map((item) => (
               <Link key={item.slug} href={`/audiobook/${item.slug}`}
                 className="group bg-gray-50 hover:bg-[#FFF1EB] border border-gray-100 hover:border-[rgba(255,107,43,0.3)] rounded-2xl p-4 text-center transition-all">
@@ -196,8 +186,10 @@ export default async function HomePage() {
               return (
                 <div key={book.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 hover:border-[rgba(255,107,43,0.3)] transition-all duration-300 hover:-translate-y-1 group">
                   <div className="relative aspect-video overflow-hidden bg-gray-200">
-                    <Image src={book.thumbnail} alt={`${book.title} — Hindi Audiobook`} fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={book.thumbnail} alt={`${book.title} — Hindi Audiobook`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy" />
                     <div className="absolute top-2 left-2">
                       <span className="bg-[#FF6B2B] text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
                         📚 {book.totalChapters} Chapters

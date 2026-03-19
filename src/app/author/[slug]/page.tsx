@@ -3,81 +3,39 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Script from "next/script";
 import AudiobookCard from "@/components/AudiobookCard";
-import { authors, getAuthorBySlug, makeAuthorSlug } from "@/data/authors";
-import { getAllAudiobooks } from "@/lib/data";
+import { authors, getAuthorBySlug } from "@/data/authors";
+import { audiobooks } from "@/data/audiobooks";
 
 interface Props { params: { slug: string } }
-
-export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   return authors.map((a) => ({ slug: a.slug }));
 }
 
-const normalizeName = (name: string) => name.trim().replace(/\s+/g, " ").toLowerCase();
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const staticAuthor = getAuthorBySlug(params.slug);
-  if (staticAuthor) {
-    return {
-      title: `${staticAuthor.name} — Hindi Audiobooks Free | HindiAudiobook.com`,
-      description: `${staticAuthor.name} ki sabhi Hindi audiobooks free mein sunein — HindiAudiobook.com. ${staticAuthor.shortBio}`,
-      alternates: { canonical: `https://www.hindiaudiobook.com/author/${staticAuthor.slug}` },
-      openGraph: {
-        title: `${staticAuthor.name} Hindi Audiobooks`,
-        description: staticAuthor.shortBio,
-        url: `https://www.hindiaudiobook.com/author/${staticAuthor.slug}`,
-        siteName: "Hindi Audiobook",
-        locale: "hi_IN",
-      },
-    };
-  }
-
-  const allBooks = await getAllAudiobooks();
-  const dynamicBooks = allBooks.filter((b) => makeAuthorSlug(b.author || "") === params.slug);
-  if (dynamicBooks.length === 0) return {};
-
-  const authorName = dynamicBooks[0].author?.trim() || "Author";
-  const count = dynamicBooks.length;
-
+  const author = getAuthorBySlug(params.slug);
+  if (!author) return {};
   return {
-    title: `${authorName} — Hindi Audiobooks Free | HindiAudiobook.com`,
-    description: `${authorName} ki ${count} uploaded Hindi audiobooks free mein sunein — HindiAudiobook.com.`,
-    alternates: { canonical: `https://www.hindiaudiobook.com/author/${params.slug}` },
+    title: `${author.name} — Hindi Audiobooks Free | HindiAudiobook.com`,
+    description: `${author.name} ki sabhi Hindi audiobooks free mein sunein — HindiAudiobook.com. ${author.shortBio}`,
+    alternates: { canonical: `https://www.hindiaudiobook.com/author/${author.slug}` },
     openGraph: {
-      title: `${authorName} Hindi Audiobooks`,
-      description: `${authorName} ki uploaded Hindi audiobooks free mein sunein.`,
-      url: `https://www.hindiaudiobook.com/author/${params.slug}`,
+      title: `${author.name} Hindi Audiobooks`,
+      description: author.shortBio,
+      url: `https://www.hindiaudiobook.com/author/${author.slug}`,
       siteName: "Hindi Audiobook",
       locale: "hi_IN",
     },
   };
 }
 
- export default async function AuthorPage({ params }: Props) {
-  const allBooks = await getAllAudiobooks();
-  const staticAuthor = getAuthorBySlug(params.slug);
-  const dynamicBySlug = allBooks.filter((b) => makeAuthorSlug(b.author || "") === params.slug);
-
-  const author = staticAuthor
-    ? staticAuthor
-    : dynamicBySlug[0]
-      ? {
-          slug: params.slug,
-          name: dynamicBySlug[0].author?.trim() || "Author",
-          nationality: "Author",
-          genre: ["Audiobooks"],
-          shortBio: `${dynamicBySlug[0].author?.trim() || "Author"} ki uploaded Hindi audiobooks.`,
-          fullBio: `${dynamicBySlug[0].author?.trim() || "Author"} ki uploaded Hindi audiobooks ab HindiAudiobook.com par available hain.`,
-          famousFor: "Hindi Audiobooks",
-          books: dynamicBySlug.map((b) => b.slug),
-        }
-      : null;
+export default function AuthorPage({ params }: Props) {
+  const author = getAuthorBySlug(params.slug);
   if (!author) notFound();
 
   // Get all audiobooks by this author
-  const authorBooks = allBooks.filter((b) =>
-    author.books.includes(b.slug) || normalizeName(b.author || "") === normalizeName(author.name)
+  const authorBooks = audiobooks.filter((b) =>
+    author.books.includes(b.slug)
   );
 
   // JSON-LD — Person schema

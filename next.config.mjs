@@ -1,10 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["img.youtube.com", "i.ytimg.com", "archive.org"],
+    remotePatterns: [
+      { protocol: "https", hostname: "img.youtube.com" },
+      { protocol: "https", hostname: "i.ytimg.com" },
+      { protocol: "https", hostname: "i3.ytimg.com" },
+      { protocol: "https", hostname: "archive.org" },
+      { protocol: "https", hostname: "**.archive.org" },
+    ],
+    // Unoptimized for external images — avoids domain issues
+    unoptimized: true,
   },
 
-  // Redirect non-www → www (canonical domain)
   async redirects() {
     return [
       {

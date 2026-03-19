@@ -1,21 +1,35 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import AudiobookCard from "@/components/AudiobookCard";
-import { getAudiobooksByCategory, categories } from "@/data/audiobooks";
+import { categories, type Audiobook } from "@/data/audiobooks";
 
 interface Props { params: { slug: string } }
 
 export default function CategoryPage({ params }: Props) {
   const category = categories.find((c) => c.slug === params.slug);
-  const allBooks = getAudiobooksByCategory(params.slug);
-
+  const [allBooks, setAllBooks] = useState<Audiobook[]>([]);
+  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<"popular" | "short" | "long">("popular");
-  const [visibleCount, setVisibleCount] = useState(6);
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  // Fetch ALL books (static + KV uploaded) and filter by category
+  useEffect(() => {
+    fetch("/api/all-audiobooks")
+      .then((r) => r.json())
+      .then((d) => {
+        const filtered = (d.data || []).filter(
+          (b: Audiobook) => b.category?.trim() === params.slug
+        );
+        setAllBooks(filtered);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [params.slug]);
 
   const sorted = useMemo(() => {
     const arr = [...allBooks];
-    if (sortBy === "popular") return arr.sort((a, b) => b.plays - a.plays);
+    if (sortBy === "popular") return arr.sort((a, b) => (b.plays || 0) - (a.plays || 0));
     const toMins = (d: string) => {
       const h = d.match(/(\d+)h/)?.[1] || "0";
       const m = d.match(/(\d+)m/)?.[1] || "0";
@@ -39,26 +53,23 @@ export default function CategoryPage({ params }: Props) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8" aria-label="Breadcrumb">
+      <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
         <Link href="/" className="hover:text-[#FF6B2B]">Home</Link>
         <span>/</span>
         <span className="text-gray-900 font-medium">{category.emoji} {category.label} Hindi Audiobooks</span>
       </nav>
 
-      {/* Category header — inline style to avoid Tailwind purge issue */}
-      <div
-        className="rounded-3xl p-8 md:p-12 text-white mb-10 relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${category.bgFrom}, ${category.bgTo})` }}
-      >
+      {/* Header */}
+      <div className="rounded-3xl p-8 md:p-12 text-white mb-10 relative overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${category.bgFrom}, ${category.bgTo})` }}>
         <div className="absolute inset-0 bg-black/15 rounded-3xl" />
         <div className="relative">
           <div className="text-6xl mb-4">{category.emoji}</div>
-          {/* H1 with SEO title */}
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "#FFFFFF" }}>
             {category.seoTitle?.split(" — ")[0] || `${category.label} Hindi Audiobooks`}
           </h1>
           <p className="text-white/80 text-lg mb-2">
-            {allBooks.length} free audiobooks — HindiAudiobook.com par sunein
+            {loading ? "..." : `${allBooks.length} free audiobooks`} — HindiAudiobook.com par sunein
           </p>
           <p className="text-white/60 text-sm max-w-2xl">{category.description}</p>
         </div>
@@ -79,18 +90,38 @@ export default function CategoryPage({ params }: Props) {
         <span className="text-gray-600 text-sm font-medium">Sort:</span>
         {[
           { value: "popular", label: "🔥 Most Popular" },
-          { value: "short", label: "⚡ Shortest First" },
-          { value: "long", label: "📚 Longest First" },
+          { value: "short",   label: "⚡ Shortest First" },
+          { value: "long",    label: "📚 Longest First" },
         ].map((opt) => (
           <button key={opt.value} onClick={() => setSortBy(opt.value as typeof sortBy)}
-            className={`text-sm font-medium px-4 py-2 rounded-xl border transition-all ${sortBy === opt.value ? "bg-[#FF6B2B] text-white border-[#FF6B2B] shadow-md" : "bg-white text-gray-700 border-gray-200 hover:border-[rgba(255,107,43,0.4)]"}`}>
+            className="text-sm font-medium px-4 py-2 rounded-xl border transition-all"
+            style={{
+              background: sortBy === opt.value ? "#FF6B2B" : "white",
+              color: sortBy === opt.value ? "white" : "#374151",
+              borderColor: sortBy === opt.value ? "#FF6B2B" : "#E5E7EB",
+            }}>
             {opt.label}
           </button>
         ))}
-        <span className="ml-auto text-gray-500 text-sm">{visible.length} / {allBooks.length} audiobooks</span>
+        <span className="ml-auto text-gray-500 text-sm">
+          {loading ? "..." : `${visible.length} / ${allBooks.length} audiobooks`}
+        </span>
       </div>
 
-      {allBooks.length === 0 ? (
+      {/* Grid */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100">
+              <div className="aspect-video shimmer" />
+              <div className="p-4 space-y-2">
+                <div className="h-4 shimmer rounded" style={{ width: "80%" }} />
+                <div className="h-3 shimmer rounded" style={{ width: "50%" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : allBooks.length === 0 ? (
         <div className="text-center py-20">
           <div className="text-6xl mb-4">😕</div>
           <p className="text-gray-500 text-xl">Is category mein abhi koi audiobook nahi hai</p>
@@ -114,7 +145,7 @@ export default function CategoryPage({ params }: Props) {
         </>
       )}
 
-      {/* SEO description block */}
+      {/* SEO block */}
       {category.seoDesc && (
         <div className="mt-12 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 mb-2">{category.seoTitle}</h2>

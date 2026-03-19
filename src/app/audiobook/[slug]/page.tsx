@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+
 import Script from "next/script";
 import AudiobookCard from "@/components/AudiobookCard";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -216,7 +216,9 @@ export default async function AudiobookDetailPage({ params }: Props) {
         <div className="space-y-6">
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-24">
             <div className="relative aspect-video rounded-xl overflow-hidden mb-5 shadow-md">
-              <Image src={book.thumbnail} alt={`${book.title} Hindi Audiobook`} fill className="object-cover" sizes="350px" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={book.thumbnail} alt={`${book.title} Hindi Audiobook`}
+                className="w-full h-full object-cover" loading="lazy" />
             </div>
             <h3 className="font-bold text-gray-900 mb-5">📋 Audiobook Details</h3>
             <div className="space-y-3">
