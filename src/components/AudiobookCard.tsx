@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Audiobook, categories } from "@/data/audiobooks";
+import { makeSlug } from "@/lib/db";
 
 export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
   const category = categories.find((c) => c.slug === audiobook.category?.trim());
@@ -77,7 +78,17 @@ export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
             {audiobook.title}
           </h3>
           <p className="text-xs mb-3" style={{ color: "#9CA3AF", fontFamily: "var(--font-inter)" }}>
-            by {authorName}
+            by{" "}
+            <span onClick={(e) => e.preventDefault()}
+              className="hover:text-[#FF6B2B] transition-colors"
+              style={{ cursor: "pointer" }}
+              onClickCapture={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = `/author/${makeSlug(authorName)}`;
+              }}>
+              {authorName}
+            </span>
           </p>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 text-xs" style={{ color: "#9CA3AF" }}>

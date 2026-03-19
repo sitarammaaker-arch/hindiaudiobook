@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJSONAsync, writeJSONAsync, nextId, makeSlug, extractVideoId } from "@/lib/db";
+import { readJSONAsync, writeJSONAsync, nextId, makeSlug, extractVideoId, getAllAuthorsFromKV, saveAllAuthors } from "@/lib/db";
+import { SEED_AUTHORS } from "@/data/authors";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,41 @@ type Audiobook = {
   author: string; description: string; trending: boolean;
   latest: boolean; plays: number; audioUrl: string; createdAt: string;
 };
+
+// ── Auto-create author in KV if not exists ────────────────────────────────
+async function ensureAuthorExists(authorName: string, bookSlug: string): Promise<void> {
+  try {
+    const authorSlug = makeSlug(authorName);
+    let authors: any[] = (await getAllAuthorsFromKV()) ?? [...SEED_AUTHORS];
+
+    const existing = authors.find((a: any) => a.slug === authorSlug);
+
+    if (existing) {
+      // Author exists — add book slug if not already there
+      if (!existing.books?.includes(bookSlug)) {
+        existing.books = [...(existing.books || []), bookSlug];
+        await saveAllAuthors(authors);
+      }
+    } else {
+      // New author — auto-create with basic info
+      const newAuthor = {
+        slug: authorSlug,
+        name: authorName,
+        nationality: "Unknown",
+        genre: [],
+        shortBio: `${authorName} ki Hindi audiobooks free mein sunein — HindiAudiobook.com par.`,
+        fullBio: `${authorName} ek popular author hain. Inki audiobooks HindiAudiobook.com par free mein available hain.`,
+        famousFor: "",
+        books: [bookSlug],
+      };
+      authors.push(newAuthor);
+      await saveAllAuthors(authors);
+    }
+  } catch (e) {
+    console.error("Author auto-create error:", e);
+    // Don't fail book upload if author creation fails
+  }
+}
 
 export async function GET() {
   try {
@@ -31,6 +67,7 @@ export async function POST(req: NextRequest) {
     const books = await readJSONAsync<Audiobook>("audiobooks.json");
     const videoId = extractVideoId(videoIdRaw);
     const slug = makeSlug(title);
+    const authorName = author.trim().replace(/^by\s+/i, "");
 
     if (books.find((b) => b.slug === slug)) {
       return NextResponse.json({ success: false, error: "Is title ka audiobook already exist karta hai" }, { status: 409 });
@@ -42,7 +79,7 @@ export async function POST(req: NextRequest) {
       thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
       duration: duration?.trim() || "Unknown",
       category: category || "self-help",
-      author: author.trim(),
+      author: authorName,
       description: description?.trim() || "",
       trending: Boolean(trending), latest: Boolean(latest),
       plays: 0, audioUrl: audioUrl?.trim() || "",
@@ -51,6 +88,9 @@ export async function POST(req: NextRequest) {
 
     books.push(newBook);
     await writeJSONAsync("audiobooks.json", books);
+
+    // Auto-create/update author in KV
+    await ensureAuthorExists(authorName, slug);
 
     return NextResponse.json({ success: true, data: newBook, message: `"${newBook.title}" successfully add ho gaya! 🎉` });
   } catch (err: any) {

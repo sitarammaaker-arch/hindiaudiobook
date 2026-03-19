@@ -8,7 +8,7 @@ import GoogleAd from "@/components/GoogleAd";
 import StarRating from "@/components/StarRating";
 import YouTubePlayTracker from "@/components/YouTubePlayTracker";
 import { getAllAudiobooks, getBookBySlug, getRelatedBooks, categories } from "@/lib/data";
-import { audiobooks } from "@/data/audiobooks";
+import { makeSlug } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -139,7 +139,13 @@ export default async function AudiobookDetailPage({ params }: Props) {
               ) : null}
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">{book.title}</h1>
-            <p className="text-gray-500 font-medium">by {authorName}</p>
+            <p className="text-gray-500 font-medium">
+              by{" "}
+              <Link href={`/author/${makeSlug(authorName)}`}
+                className="hover:text-[#FF6B2B] transition-colors hover:underline">
+                {authorName}
+              </Link>
+            </p>
           </div>
 
           <GoogleAd slot="1234567890" />
@@ -169,9 +175,8 @@ export default async function AudiobookDetailPage({ params }: Props) {
             <div className="space-y-3">
               {[
                 { label: "Title",    value: book.title },
-                { label: "Author",   value: authorName },
-                { label: "Category", value: category ? `${category.emoji} ${category.label}` : categorySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "General" },
                 { label: "Language", value: "Hindi 🇮🇳" },
+                { label: "Category", value: category ? `${category.emoji} ${category.label}` : categorySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "General" },
                 { label: "Duration", value: book.duration },
                 { label: "Player",   value: hasDirectAudio ? "🟢 HTML5 (Lock Screen ✅)" : "🔴 YouTube Only" },
                 { label: "Price",    value: "🆓 Bilkul Free" },
@@ -181,6 +186,15 @@ export default async function AudiobookDetailPage({ params }: Props) {
                   <span className="text-gray-900 text-xs font-medium text-right">{item.value}</span>
                 </div>
               ))}
+              {/* Author — clickable */}
+              <div className="flex justify-between items-start gap-3">
+                <span className="text-gray-400 text-xs flex-shrink-0">Author</span>
+                <Link href={`/author/${makeSlug(authorName)}`}
+                  className="text-xs font-medium text-right hover:text-[#FF6B2B] transition-colors hover:underline"
+                  style={{ color: "#FF6B2B" }}>
+                  {authorName}
+                </Link>
+              </div>
             </div>
             <div className="mt-5 space-y-2">
               <a href={`https://www.youtube.com/watch?v=${book.videoId}`} target="_blank" rel="noopener noreferrer"
