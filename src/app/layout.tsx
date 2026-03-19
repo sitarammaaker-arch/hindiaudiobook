@@ -59,7 +59,12 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://www.hindiaudiobook.com",
+    languages: {
+      "hi-IN": "https://www.hindiaudiobook.com",
+    },
   },
+  // Add your Google Search Console verification code below
+  // verification: { google: "your-verification-code-here" },
   robots: {
     index: true,
     follow: true,

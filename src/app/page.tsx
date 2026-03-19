@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AudiobookCard from "@/components/AudiobookCard";
 import GoogleAd from "@/components/GoogleAd";
+import RecentlyListened from "@/components/RecentlyListened";
 import {
   getAllAudiobooks, getAllChapterBooks, getCategoryCounts, categories,
   type Audiobook, type ChapterBook,
@@ -265,6 +266,10 @@ export default async function HomePage() {
             ))}
           </div>
         </section>
+
+        {/* Recently Listened — client side, shows if user has visited books */}
+        <RecentlyListened />
+
       </div>
     </main>
   );

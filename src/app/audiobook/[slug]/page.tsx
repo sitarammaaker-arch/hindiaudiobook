@@ -8,6 +8,8 @@ import GoogleAd from "@/components/GoogleAd";
 import StarRating from "@/components/StarRating";
 import LiteYouTube from "@/components/LiteYouTube";
 import StickyPlayer from "@/components/StickyPlayer";
+import TrackVisit from "@/components/TrackVisit";
+import RecentlyListened from "@/components/RecentlyListened";
 import { getAllAudiobooks, getBookBySlug, getRelatedBooks, categories } from "@/lib/data";
 import { makeSlug } from "@/lib/utils";
 
@@ -95,6 +97,14 @@ export default async function AudiobookDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Track this visit for Recently Listened */}
+      <TrackVisit
+        slug={book.slug}
+        title={book.title}
+        author={authorName}
+        thumbnail={book.thumbnail}
+        category={book.category}
+      />
       <Script id="audio-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(audioJsonLd) }} />
       <Script id="breadcrumb-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -280,7 +290,10 @@ export default async function AudiobookDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* Sticky bottom player — appears on scroll */}
+      {/* Recently Listened — shows other books user visited */}
+      <RecentlyListened />
+
+      {/* Sticky bottom player */}
       <StickyPlayer
         videoId={book.videoId}
         title={book.title}
