@@ -37,11 +37,11 @@ export default async function HomePage() {
             🎧 {allBooks.length} Free Hindi Audiobooks
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight" style={{ fontFamily: "var(--font-merriweather)" }}>
-            Hindi Audiobooks<br />
-            <span style={{ color: "#FF6B2B" }}>Bilkul Free</span>
+            Free Hindi Audiobooks<br />
+            <span style={{ color: "#FF6B2B" }}>Bilkul Free — Online Sunein</span>
           </h1>
           <p className="text-white/70 text-lg md:text-xl max-w-2xl mx-auto mb-8">
-            Trading, Self Help, Story — sabhi audiobooks free mein sunein. Koi download nahi, koi signup nahi.
+            Trading Psychology, Self Help, Spiritual — sabhi Hindi audiobooks free mein sunein. Koi download nahi, koi signup nahi.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/search"

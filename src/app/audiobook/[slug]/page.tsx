@@ -23,13 +23,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const book = await getBookBySlug(params.slug);
   if (!book) return {};
   const cat = categories.find((c) => c.slug === book.category);
+  const authorName = book.author?.replace(/^by\s+/i, "") || book.author || "";
   return {
-    title: `${book.title} — Free Hindi Audiobook Online | HindiAudiobook.com`,
-    description: `${book.title} by ${book.author} sunein bilkul free — HindiAudiobook.com. ${book.duration} ki yeh ${cat?.label || book.category} hindi audiobook. Download ki zaroorat nahi.`,
+    title: `${book.title} — ${authorName} Free Hindi Audiobook`,
+    description: `${book.title} by ${authorName} sunein bilkul free — HindiAudiobook.com. ${book.duration} ki yeh ${cat?.label || book.category} hindi audiobook. Download ki zaroorat nahi, seedha browser mein play karein.`,
     alternates: { canonical: `https://www.hindiaudiobook.com/audiobook/${book.slug}` },
     openGraph: {
       title: `${book.title} — Hindi Audiobook Free`,
-      description: `${book.author} ki yeh ${book.duration} ki audiobook free mein sunein`,
+      description: `${authorName} ki yeh ${book.duration} ki audiobook free mein sunein — HindiAudiobook.com`,
       url: `https://www.hindiaudiobook.com/audiobook/${book.slug}`,
       images: [{ url: book.thumbnail, width: 480, height: 360, alt: `${book.title} Hindi Audiobook` }],
       locale: "hi_IN", type: "website",
@@ -47,12 +48,19 @@ export default async function AudiobookDetailPage({ params }: Props) {
   const hasDirectAudio = Boolean(book.audioUrl?.trim());
   const authorName = book.author?.replace(/^by\s+/i, "") || book.author || "";
 
+  // Convert "8h 31m" → "PT8H31M" for schema.org
+  const toISODuration = (d: string) => {
+    const h = d.match(/(\d+)h/)?.[1] || "0";
+    const m = d.match(/(\d+)m/)?.[1] || "0";
+    return `PT${h}H${m}M`;
+  };
+
   const audioJsonLd = {
     "@context": "https://schema.org",
     "@type": "AudioObject",
     "name": book.title,
     "description": (book.description || "").slice(0, 300),
-    "duration": book.duration,
+    "duration": toISODuration(book.duration || "0h 0m"),
     "inLanguage": "hi",
     "author": { "@type": "Person", "name": authorName },
     "thumbnailUrl": book.thumbnail,
@@ -60,6 +68,17 @@ export default async function AudiobookDetailPage({ params }: Props) {
     "contentUrl": book.audioUrl || `https://www.youtube.com/watch?v=${book.videoId}`,
     "genre": category?.label || book.category,
     "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "INR",
+      "availability": "https://schema.org/InStock",
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "HindiAudiobook.com",
+      "url": "https://www.hindiaudiobook.com",
+    },
   };
 
   const breadcrumbJsonLd = {

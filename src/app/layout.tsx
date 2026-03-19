@@ -9,11 +9,11 @@ const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-XXXXXXX
 
 export const metadata: Metadata = {
   title: {
-    default: "Hindi Audiobook — Free Hindi Audiobooks Online Sunein",
+    default: "Free Hindi Audiobooks Online — Trading, Self Help, Spiritual | HindiAudiobook.com",
     template: "%s | HindiAudiobook.com",
   },
   description:
-    "HindiAudiobook.com — India ka #1 free Hindi audiobook platform. Hindi audio books, audiobooks in Hindi sunein bilkul free. Motivational, Finance, Spiritual, Story, Kids — sabhi categories. Download ki zaroorat nahi.",
+    "HindiAudiobook.com — India ka #1 free Hindi audiobook platform. 35+ Hindi audiobooks bilkul free — Trading Psychology, Rich Dad Poor Dad, Atomic Habits, Bhagavad Gita aur bahut kuch. Koi download nahi, koi signup nahi.",
   keywords: [
     // Top performing — exact match
     "hindi audiobook",
