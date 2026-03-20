@@ -78,6 +78,8 @@ export const metadata: Metadata = {
   },
 };
 
+const GA_ID = "G-XC7F38WMBD";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -91,6 +93,21 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="min-h-screen flex flex-col" style={{ background: "#FFF8F5" }}>
+        {/* Google Analytics GA4 */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}', {
+              page_path: window.location.pathname,
+            });
+          `}
+        </Script>
         {/* Google AdSense */}
         <Script
           async
