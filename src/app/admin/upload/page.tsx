@@ -98,12 +98,325 @@ function SubmitBtn({ loading, label, color = "indigo" }: { loading: boolean; lab
   );
 }
 
+// ─── Bulk Upload Tab Component ───────────────────────────────────────────────
+const SAMPLE_CSV = `title,author,category,duration,videoId,description
+Trading in the Zone Hindi,Mark Douglas,trading-psychology,8h 31m,XGJYX7-NsQM,Trading psychology masterpiece
+Atomic Habits Hindi,James Clear,self-help,5h 52m,SiRjldq6vhE,Tiny habits big results
+Rich Dad Poor Dad Hindi,Robert Kiyosaki,wealth-finance,7h 02m,nFvPuYg8nkg,Financial education book`;
+
+const CATEGORIES_MAP: Record<string, string> = {
+  "trading psychology": "trading-psychology",
+  "trading-psychology": "trading-psychology",
+  "wealth": "wealth-finance",
+  "wealth finance": "wealth-finance",
+  "wealth-finance": "wealth-finance",
+  "power": "power-strategy",
+  "power strategy": "power-strategy",
+  "power-strategy": "power-strategy",
+  "story": "story",
+  "novel": "story",
+  "self help": "self-help",
+  "selfhelp": "self-help",
+  "self-help": "self-help",
+  "motivational": "self-help",
+  "spiritual": "spiritual",
+  "kids": "kids",
+  "children": "kids",
+};
+
+function normalizeCategory(raw: string): string {
+  if (!raw) return "self-help";
+  const lower = raw.toLowerCase().trim();
+  return CATEGORIES_MAP[lower] || lower.replace(/\s+/g, "-") || "self-help";
+}
+
+function parseCSV(text: string): Record<string, string>[] {
+  const lines = text.trim().split("\n").map(l => l.trim()).filter(Boolean);
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(",").map(h => h.trim().toLowerCase().replace(/\s+/g, "_"));
+  return lines.slice(1).map((line, idx) => {
+    // Handle quoted fields with commas
+    const values: string[] = [];
+    let current = "";
+    let inQuotes = false;
+    for (const char of line) {
+      if (char === '"') { inQuotes = !inQuotes; }
+      else if (char === "," && !inQuotes) { values.push(current.trim()); current = ""; }
+      else { current += char; }
+    }
+    values.push(current.trim());
+    const row: Record<string, string> = { _row: String(idx + 2) };
+    headers.forEach((h, i) => { row[h] = values[i] || ""; });
+    return row;
+  });
+}
+
+function BulkUploadTab() {
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<Record<string, string>[]>([]);
+  const [status, setStatus] = useState<Status>({ type: "idle", message: "" });
+  const [result, setResult] = useState<any>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFile = async (f: File) => {
+    setFile(f);
+    setResult(null);
+    setStatus({ type: "idle", message: "" });
+
+    if (f.name.endsWith(".csv") || f.type === "text/csv") {
+      const text = await f.text();
+      const rows = parseCSV(text);
+      setPreview(rows.slice(0, 5));
+    } else if (f.name.endsWith(".xlsx") || f.name.endsWith(".xls")) {
+      // For Excel — convert to CSV approach using FileReader
+      setStatus({ type: "loading", message: "Excel file parse ho rahi hai..." });
+      try {
+        const arrayBuffer = await f.arrayBuffer();
+        // Simple XLSX parser — read as text to extract data
+        const text = new TextDecoder("utf-8", { fatal: false }).decode(new Uint8Array(arrayBuffer));
+        // Check if it's actually a zip (xlsx)
+        if (text.startsWith("PK")) {
+          setStatus({ type: "error", message: "Excel ke liye .xlsx ko pehle Google Sheets mein open karein → File → Download → CSV format mein save karein, phir CSV upload karein." });
+          setFile(null);
+          return;
+        }
+        // Try as CSV
+        const rows = parseCSV(text);
+        setPreview(rows.slice(0, 5));
+        setStatus({ type: "idle", message: "" });
+      } catch {
+        setStatus({ type: "error", message: "File parse nahi ho sakti. CSV format use karein." });
+      }
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file || preview.length === 0) return;
+    setUploading(true);
+    setStatus({ type: "loading", message: "Books upload ho rahi hain..." });
+
+    try {
+      const text = await file.text();
+      const allRows = parseCSV(text);
+      // Normalize categories
+      const normalized = allRows.map(row => ({
+        ...row,
+        category: normalizeCategory(row.category || row.category_slug || ""),
+        videoId: row.videoid || row.video_id || row.youtube_id || row.youtube_url || row.youtube || row.video || "",
+      }));
+
+      const res = await fetch("/api/bulk-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ books: normalized }),
+      });
+      const data = await res.json();
+      setResult(data);
+      if (data.success) {
+        setStatus({ type: "success", message: data.message });
+      } else {
+        setStatus({ type: "error", message: data.error || "Upload failed" });
+      }
+    } catch (e: any) {
+      setStatus({ type: "error", message: e.message });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const downloadSample = () => {
+    const blob = new Blob([SAMPLE_CSV], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "bulk_upload_sample.csv";
+    a.click(); URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">📦</span>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Bulk Upload — CSV se Multiple Books</h2>
+              <p className="text-gray-500 text-sm">Ek baar mein 100+ audiobooks upload karein</p>
+            </div>
+          </div>
+          <button onClick={downloadSample}
+            className="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-xl border-2 transition-colors"
+            style={{ borderColor: "#FF6B2B", color: "#FF6B2B" }}>
+            ⬇️ Sample CSV
+          </button>
+        </div>
+
+        {/* CSV Format guide */}
+        <div className="bg-gray-50 rounded-xl p-4 mb-5">
+          <p className="text-xs font-bold text-gray-700 mb-2">📋 Required CSV Columns:</p>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { col: "title", req: "✅ Required", eg: "Trading in the Zone Hindi" },
+              { col: "videoId", req: "✅ Required", eg: "XGJYX7-NsQM ya full URL" },
+              { col: "author", req: "Recommended", eg: "Mark Douglas" },
+              { col: "category", req: "Recommended", eg: "trading-psychology" },
+              { col: "duration", req: "Optional", eg: "8h 31m" },
+              { col: "description", req: "Optional", eg: "Book description..." },
+            ].map(({ col, req, eg }) => (
+              <div key={col} className="bg-white rounded-lg p-2 border border-gray-100">
+                <div className="flex items-center gap-1.5">
+                  <code className="text-xs font-bold text-indigo-700">{col}</code>
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${req === "✅ Required" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"}`}>{req}</span>
+                </div>
+                <p className="text-xs text-gray-400 mt-0.5">{eg}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 p-2 bg-blue-50 rounded-lg">
+            <p className="text-xs text-blue-700 font-medium">📌 Category valid values:</p>
+            <p className="text-xs text-blue-600 mt-0.5">trading-psychology, wealth-finance, power-strategy, story, self-help, spiritual, kids</p>
+          </div>
+        </div>
+
+        {/* File drop zone */}
+        <label className="block cursor-pointer">
+          <div className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center hover:border-[#FF6B2B] hover:bg-[#FFF8F5] transition-all"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}>
+            <div className="text-4xl mb-3">📂</div>
+            <p className="text-gray-700 font-semibold">CSV file drag & drop karein</p>
+            <p className="text-gray-400 text-sm mt-1">ya click karke select karein</p>
+            <p className="text-xs text-gray-400 mt-2">Supported: .csv format</p>
+            {file && (
+              <div className="mt-3 inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full">
+                <span>✅</span>
+                <span className="text-sm font-medium">{file.name}</span>
+                <span className="text-xs text-green-500">({(file.size / 1024).toFixed(1)} KB)</span>
+              </div>
+            )}
+          </div>
+          <input type="file" accept=".csv,.xlsx,.xls" className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+        </label>
+      </div>
+
+      <StatusBar status={status} />
+
+      {/* Preview */}
+      {preview.length > 0 && (
+        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <h3 className="font-bold text-gray-900 mb-3">👀 Preview (pehli 5 rows)</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr className="bg-gray-50">
+                  {["#", "Title", "Author", "Category", "Duration", "VideoId"].map(h => (
+                    <th key={h} className="text-left p-2 border border-gray-100 font-semibold text-gray-600">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {preview.map((row, i) => (
+                  <tr key={i} className="hover:bg-gray-50">
+                    <td className="p-2 border border-gray-100 text-gray-400">{i + 1}</td>
+                    <td className="p-2 border border-gray-100 font-medium text-gray-900 max-w-xs truncate">{row.title || <span className="text-red-500">Missing!</span>}</td>
+                    <td className="p-2 border border-gray-100 text-gray-600">{row.author || "—"}</td>
+                    <td className="p-2 border border-gray-100">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
+                        {normalizeCategory(row.category || "")}
+                      </span>
+                    </td>
+                    <td className="p-2 border border-gray-100 text-gray-600">{row.duration || "—"}</td>
+                    <td className="p-2 border border-gray-100 font-mono text-gray-500 max-w-xs truncate">
+                      {row.videoid || row.video_id || row.youtube_url || row.youtube || <span className="text-red-500">Missing!</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-gray-400 mt-2">Sirf pehli 5 rows dikh rahi hain — sab books upload hongi</p>
+        </div>
+      )}
+
+      {/* Upload button */}
+      {file && preview.length > 0 && !result && (
+        <button onClick={handleUpload} disabled={uploading}
+          className="w-full py-4 rounded-2xl font-bold text-white text-lg transition-all disabled:opacity-60 flex items-center justify-center gap-3 shadow-lg"
+          style={{ background: uploading ? "#9CA3AF" : "#FF6B2B" }}>
+          {uploading ? (
+            <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Uploading...</>
+          ) : (
+            <>📦 Sab Books Upload Karein ({preview.length}+ books)</>
+          )}
+        </button>
+      )}
+
+      {/* Result */}
+      {result && (
+        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4">
+          <h3 className="font-bold text-gray-900 text-lg">📊 Upload Result</h3>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: "✅ Add Hui", value: result.added, color: "bg-green-50 text-green-700" },
+              { label: "⏭️ Already Thi", value: result.skipped, color: "bg-yellow-50 text-yellow-700" },
+              { label: "❌ Errors", value: result.errors, color: "bg-red-50 text-red-700" },
+            ].map(({ label, value, color }) => (
+              <div key={label} className={`${color} rounded-xl p-4 text-center`}>
+                <p className="text-3xl font-bold">{value}</p>
+                <p className="text-sm font-medium mt-1">{label}</p>
+              </div>
+            ))}
+          </div>
+          {result.skippedTitles?.length > 0 && (
+            <div className="bg-yellow-50 rounded-xl p-4">
+              <p className="text-xs font-bold text-yellow-800 mb-2">Already existed (skip ki gayi):</p>
+              <p className="text-xs text-yellow-700">{result.skippedTitles.join(", ")}</p>
+            </div>
+          )}
+          {result.errorDetails?.length > 0 && (
+            <div className="bg-red-50 rounded-xl p-4">
+              <p className="text-xs font-bold text-red-800 mb-2">Errors:</p>
+              {result.errorDetails.map((e: string, i: number) => (
+                <p key={i} className="text-xs text-red-700">{e}</p>
+              ))}
+            </div>
+          )}
+          <button onClick={() => { setFile(null); setPreview([]); setResult(null); setStatus({ type: "idle", message: "" }); }}
+            className="w-full py-3 rounded-xl font-semibold border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+            🔄 Naya Batch Upload Karein
+          </button>
+        </div>
+      )}
+
+      {/* Excel help */}
+      <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
+        <h4 className="font-bold text-blue-900 mb-3">📊 Excel (.xlsx) se CSV kaise banayein?</h4>
+        <ol className="space-y-2">
+          {[
+            "Excel ya Google Sheets mein apna data banao",
+            "Columns: title, videoId, author, category, duration, description",
+            "Google Sheets: File → Download → Comma Separated Values (.csv)",
+            "Excel: File → Save As → CSV UTF-8 format select karein",
+            "Us CSV file ko yahan upload karein",
+          ].map((step, i) => (
+            <li key={i} className="flex items-start gap-2 text-sm text-blue-800">
+              <span className="w-5 h-5 bg-blue-200 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold">{i + 1}</span>
+              {step}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+}
+
 // ─── Bulk Chapter Upload Progress ────────────────────────────────────────────
 type BulkStatus = { file: string; status: "pending" | "uploading" | "done" | "error"; message?: string };
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 export default function UploadPage() {
-  const [tab, setTab] = useState<"audiobook" | "book" | "chapter" | "manage" | "authors">("audiobook");
+  const [tab, setTab] = useState<"audiobook" | "bulk" | "book" | "chapter" | "manage" | "authors">("audiobook");
 
   // ── Audiobook form state ──────────────────────────────────────────────────
   const [ab, setAb] = useState({
@@ -457,9 +770,10 @@ export default function UploadPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
         {/* Tabs */}
-        <div className="grid grid-cols-5 gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100">
+        <div className="grid grid-cols-6 gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100">
           {[
             { id: "audiobook", label: "🎧 Audiobook" },
+            { id: "bulk",      label: "📦 Bulk Upload" },
             { id: "book",      label: "📖 New Book" },
             { id: "chapter",   label: "📑 Chapter" },
             { id: "authors",   label: "✍️ Authors" },
@@ -548,6 +862,9 @@ export default function UploadPage() {
             <SubmitBtn loading={abStatus.type === "loading"} label="Audiobook Upload Karein" color="indigo" />
           </form>
         )}
+
+        {/* ── TAB BULK: Bulk Upload ──────────────────────────────────────── */}
+        {tab === "bulk" && <BulkUploadTab />}
 
         {/* ── TAB 2: New Book ────────────────────────────────────────────── */}
         {tab === "book" && (
