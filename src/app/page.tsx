@@ -26,7 +26,10 @@ export default async function HomePage() {
   }
 
   const trending = allBooks.filter((b) => b.trending).sort((a, b) => (b.plays||0) - (a.plays||0)).slice(0, 9);
-  const latest   = allBooks.filter((b) => b.latest).sort((a, b) => (b.plays||0) - (a.plays||0)).slice(0, 6);
+  // Nayi books — createdAt se sort karo, latest 6 dikhao
+  const latest = [...allBooks]
+    .sort((a, b) => new Date((b as any).createdAt || 0).getTime() - new Date((a as any).createdAt || 0).getTime())
+    .slice(0, 6);
   const topPlays = [...allBooks].sort((a, b) => (b.plays||0) - (a.plays||0)).slice(0, 6);
 
   return (
@@ -127,7 +130,7 @@ export default async function HomePage() {
                 <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "var(--font-merriweather)" }}>
                   🆕 Nayi Hindi Audiobooks
                 </h2>
-                <p className="text-gray-500 text-sm mt-1">Admin panel mein Latest select kiye books</p>
+                <p className="text-gray-500 text-sm mt-1">Sabse nayi upload ki gayi audiobooks</p>
               </div>
               <Link href="/free-hindi-audiobooks" className="text-[#FF6B2B] text-sm font-semibold hover:underline hidden sm:block">
                 Sab dekhein →

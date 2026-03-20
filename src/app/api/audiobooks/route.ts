@@ -81,7 +81,8 @@ export async function POST(req: NextRequest) {
       category: category || "self-help",
       author: authorName,
       description: description?.trim() || "",
-      trending: Boolean(trending), latest: Boolean(latest),
+      trending: Boolean(trending),
+      latest: true, // Naye upload hamesha "Latest" section mein dikhein
       plays: 0, audioUrl: audioUrl?.trim() || "",
       createdAt: new Date().toISOString(),
     };
