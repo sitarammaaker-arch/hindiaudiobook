@@ -208,20 +208,23 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {chapterBooks.slice(0, 3).map((book) => {
                 const cat = categories.find((c) => c.slug === book.category);
+                const chapters = (book as any).chapters || [];
                 return (
                   <Link key={book.id} href={`/audiobook/${book.slug}/chapters`} className="group block">
                     <div className="card bg-white overflow-hidden" style={{ borderRadius: "16px" }}>
                       <div className="relative overflow-hidden" style={{ aspectRatio: "16/9" }}>
                         <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105"
                           style={{
-                            backgroundImage: `url(${book.thumbnail})`,
+                            backgroundImage: book.thumbnail ? `url(${book.thumbnail})` : undefined,
                             backgroundSize: "cover", backgroundPosition: "center",
                             background: book.thumbnail
                               ? `url(${book.thumbnail}) center/cover`
                               : `linear-gradient(135deg, ${cat?.bgFrom || "#1A1A2E"}, ${cat?.bgTo || "#2F2F52"})`,
                           }} />
+                        {/* Dark overlay on hover */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all" />
                         <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded-lg">
-                          📖 {book.totalChapters} chapters
+                          📖 {chapters.length || book.totalChapters || 0} chapters
                         </div>
                         <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded-lg">
                           {book.totalDuration}
