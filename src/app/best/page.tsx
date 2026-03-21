@@ -38,15 +38,26 @@ export default async function BestListsPage() {
           return (
             <Link key={list.slug} href={`/best/${list.slug}`}
               className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-[rgba(255,107,43,0.3)] hover:shadow-xl shadow-sm transition-all duration-300 hover:-translate-y-1">
-              <div className="p-6 text-white"
+              {/* Card header — dark bg with saffron accent */}
+              <div className="p-6 relative overflow-hidden"
                 style={{ background: `linear-gradient(135deg, ${list.bgFrom}, ${list.bgTo})` }}>
+                {/* Saffron top border accent */}
+                <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: "#FF6B2B" }} />
+                {/* Subtle saffron glow */}
+                <div className="absolute bottom-0 right-0 w-24 h-24 rounded-full opacity-20"
+                  style={{ background: "#FF6B2B", transform: "translate(30%, 30%)" }} />
                 <div className="text-4xl mb-3">{list.emoji}</div>
-                <h2 className="font-bold text-lg leading-snug">{list.title}</h2>
+                <h2 className="font-bold text-lg leading-snug text-white">{list.title}</h2>
+                {/* Saffron pill badge */}
+                <div className="inline-flex items-center gap-1 mt-3 px-2.5 py-1 rounded-full text-xs font-semibold"
+                  style={{ background: "rgba(255,107,43,0.25)", color: "#FF8C5A", border: "1px solid rgba(255,107,43,0.3)" }}>
+                  {books.length} audiobooks · Free
+                </div>
               </div>
+              {/* Card body */}
               <div className="p-5">
                 <p className="text-gray-600 text-sm leading-relaxed mb-4">{list.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400 text-xs">{books.length} audiobooks · Free</span>
+                <div className="flex items-center justify-end">
                   <span className="bg-[#FFF1EB] group-hover:bg-[#FF6B2B] text-[#E85A1A] group-hover:text-white text-xs font-semibold px-3 py-1.5 rounded-xl transition-colors">
                     Dekhein →
                   </span>
