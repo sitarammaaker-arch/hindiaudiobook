@@ -1247,6 +1247,24 @@ export default function UploadPage() {
               )}
             </div>
 
+            {/* Newsletter Subscribers */}
+            <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
+              <p className="text-gray-500 text-sm mb-1">Newsletter subscribers dekho</p>
+              <p className="text-xs text-gray-400 mb-3">Kitne log email subscribe kar chuke hain</p>
+              <button
+                onClick={async () => {
+                  const res = await fetch("/api/newsletter");
+                  const d = await res.json();
+                  if (d.success) {
+                    setAuthStatus({ type: "success", message: `📧 Total ${d.count} subscribers hain` });
+                  }
+                }}
+                className="text-sm font-semibold px-6 py-2 rounded-xl border-2 transition-colors"
+                style={{ borderColor: "#6366F1", color: "#6366F1" }}>
+                📧 Subscribers Check Karo
+              </button>
+            </div>
+
             {/* Seed button */}
             <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
               <p className="text-gray-500 text-sm mb-3">9 original static authors ko KV mein seed karna hai?</p>
