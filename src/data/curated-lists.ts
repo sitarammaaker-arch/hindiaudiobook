@@ -28,8 +28,8 @@ Duniya ke sabse successful traders ek cheez mein agree karte hain: technical kno
 Mark Douglas — jise "Father of Trading Psychology" kaha jaata hai — ki dono books yahan hain. Aur Jack Schwager ki Market Wizards, jisme 17 legendary traders ne directly bataya hai ki woh kya differently karte hain.
 
 In sabhi books ko Hindi mein sunn kar aap woh mental framework develop kar sakte hain jo ek average trader ko champion trader mein badalta hai.`,
-    bgFrom: "#2563eb",
-    bgTo: "#0891b2",
+    bgFrom: "#0F2A4A",
+    bgTo: "#1A3A5C",
     books: [
       "the-disciplined-trader-hindi-audiobook",
       "trading-in-the-zone-full-hindi-audiobook",
@@ -55,8 +55,8 @@ Financial freedom ka raasta alag hai — aur is curated list ki books woh raasta
 Robert Kiyosaki ne "Rich Dad Poor Dad" mein assets vs liabilities ka fundamental difference explain kiya. Morgan Housel ne "Psychology of Money" mein bataya ki paisa manage karna ek behavior hai, math nahi. Richard Koch ne "80/20 Principle" mein bataya ki 20% effort se 80% results kaise milte hain.
 
 Yeh books milkar ek complete financial education deti hain — school mein jo kabhi nahi sikhaya gaya.`,
-    bgFrom: "#10b981",
-    bgTo: "#16a34a",
+    bgFrom: "#0A2A1A",
+    bgTo: "#0F3A24",
     books: [
       "rich-dad-poor-dad-hindi-audiobook",
       "the-psychology-of-money-hindi-audiobook",
@@ -80,8 +80,8 @@ Is list mein sirf woh books hain jinhe actually implement kiya ja sakta hai — 
 James Clear ki "Atomic Habits" scientifically proven framework deti hai. Napoleon Hill ki "Think and Grow Rich" 80 saal se consistently best self-help book rahi hai. Hector Garcia ki "Ikigai" aapko apna life purpose dhundhne mein help karti hai.
 
 Teeno books ko Hindi mein sun kar aap apni life ka direction set kar sakte hain.`,
-    bgFrom: "#ef4444",
-    bgTo: "#db2777",
+    bgFrom: "#2A0A0A",
+    bgTo: "#3A0F10",
     books: [
       "atomic-habits-hindi-audiobook",
       "think-and-grow-rich-hindi-audiobook",
@@ -107,8 +107,8 @@ Teeno books ko Hindi mein sun kar aap apni life ka direction set kar sakte hain.
 Robert Greene ne "48 Laws of Power" mein history ke sabse powerful logon ke real examples se 48 laws derive kiye. Aur Chanakya — 2300 saal pehle India mein — ne wahi principles document kiye the jo aaj bhi work karte hain.
 
 Peter Thiel ki "Zero to One" mein monopoly businesses ki power explain ki gayi hai. In books ko Hindi mein sunn kar aap samjhenge ki duniya actually kaise kaam karti hai.`,
-    bgFrom: "#f59e0b",
-    bgTo: "#ea580c",
+    bgFrom: "#2A1A0A",
+    bgTo: "#3A2410",
     books: [
       "48-laws-of-power-hindi-audiobook",
       "chanakya-neeti-hindi-audiobook",
@@ -130,8 +130,8 @@ Paulo Coelho ki "The Alchemist" 150 million copies bik chuki hai — ek young sh
 Yuval Noah Harari ki "Sapiens" human history ko ek thriller ki tarah present karti hai. Anne Frank ki diary World War II mein ek 13-year-old ki real story hai.
 
 In books ko Hindi mein sun kar aap entertain bhi honge aur kuch deeply valuable bhi seekhenge.`,
-    bgFrom: "#a855f7",
-    bgTo: "#7c3aed",
+    bgFrom: "#1A0A2A",
+    bgTo: "#240F3A",
     books: [
       "the-alchemist-hindi-audiobook",
       "sapiens-hindi-audiobook",
@@ -153,8 +153,8 @@ In books ko Hindi mein sun kar aap entertain bhi honge aur kuch deeply valuable 
 Bhagavad Gita mein Shri Krishna ne Arjun ko jo gyan diya woh sirf yuddh ke liye nahi tha — woh aaj bhi har insaan ki daily life ki problems solve karne mein madad karta hai. Ramcharitmanas mein Tulsidas ne Shri Ram ki poori katha 7 kandos mein likhi hai. Swami Vivekananda ki Gyan Yoga — Vedanta ka sara saara gyaan ek jagah.
 
 Yeh teeno texts milkar ek complete spiritual library hain jo har Hindi bolne wale ke kaam aati hain.`,
-    bgFrom: "#6366f1",
-    bgTo: "#9333ea",
+    bgFrom: "#0F0A2A",
+    bgTo: "#1A0F3A",
     books: [
       "bhagawad-geeta-hindi-audiobook",
       "ramcharitmanas-sampurn-hindi-audiobook",

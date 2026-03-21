@@ -86,7 +86,7 @@ export default function NewsletterForm({ source = "homepage" }: { source?: strin
           type="submit"
           disabled={status === "loading"}
           className="px-6 py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-70 whitespace-nowrap shadow-lg hover:-translate-y-0.5"
-          style={{ background: "#FFD700", color: "#7C1D00" }}>
+          style={{ background: "#FF6B2B", color: "#ffffff" }}>
           {status === "loading" ? "⏳..." : "🔔 Subscribe"}
         </button>
       </div>

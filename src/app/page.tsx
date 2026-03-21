@@ -270,16 +270,21 @@ export default async function HomePage() {
 
         {/* ── Newsletter Section ── */}
         <section className="rounded-3xl p-8 md:p-12 text-center relative overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #FF6B2B 0%, #E85A1A 50%, #C94A0E 100%)" }}>
-          <div className="absolute inset-0 opacity-10"
-            style={{ background: "radial-gradient(circle at 70% 50%, #FFD700, transparent)" }} />
+          style={{ background: "#1A1A2E", border: "1px solid rgba(255,107,43,0.2)" }}>
+          {/* Subtle saffron accent top border */}
+          <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl"
+            style={{ background: "#FF6B2B" }} />
           <div className="relative">
-            <div className="text-4xl mb-4">🔔</div>
+            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-5 text-xs font-semibold"
+              style={{ background: "rgba(255,107,43,0.15)", color: "#FF6B2B", border: "1px solid rgba(255,107,43,0.3)" }}>
+              🔔 Free Newsletter
+            </div>
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-3"
               style={{ fontFamily: "var(--font-merriweather)" }}>
               Nayi Audiobooks Ki Notification Paayein
             </h2>
-            <p className="text-white/85 mb-6 max-w-lg mx-auto">
+            <p className="mb-6 max-w-lg mx-auto text-sm md:text-base"
+              style={{ color: "rgba(255,255,255,0.6)" }}>
               Har hafte nayi Hindi audiobooks upload hoti hain — email par seedha notification milegi. Bilkul free, kabhi bhi unsubscribe kar sakte hain.
             </p>
             <NewsletterForm source="homepage-section" />

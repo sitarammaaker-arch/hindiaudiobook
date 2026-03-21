@@ -68,22 +68,28 @@ export default async function CuratedListPage({ params }: Props) {
       {/* Header */}
       <div className="rounded-3xl p-8 md:p-12 text-white mb-10 relative overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${list.bgFrom}, ${list.bgTo})` }}>
-        <div className="absolute inset-0 bg-black/10 rounded-3xl" />
+        {/* Saffron top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl"
+          style={{ background: "#FF6B2B" }} />
+        {/* Subtle saffron glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-10"
+          style={{ background: "#FF6B2B", transform: "translate(30%, -30%)" }} />
         <div className="relative">
           <div className="text-5xl mb-4">{list.emoji}</div>
           <h1 className="font-heading font-black text-2xl md:text-3xl mb-2"
             style={{ color: "#FFFFFF", letterSpacing: "-0.02em" }}>
             {list.seoTitle}
           </h1>
-          <p className="text-white/80 text-lg">{list.description}</p>
+          <p className="text-white/70 text-lg">{list.description}</p>
           <div className="flex items-center gap-3 mt-4">
-            <span className="bg-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-full"
+              style={{ background: "rgba(255,107,43,0.2)", color: "#FF6B2B", border: "1px solid rgba(255,107,43,0.3)" }}>
               {books.length} Audiobooks
             </span>
-            <span className="bg-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+            <span className="bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20">
               Updated {list.updatedYear}
             </span>
-            <span className="bg-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+            <span className="bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/20">
               🆓 Sabhi Free
             </span>
           </div>
