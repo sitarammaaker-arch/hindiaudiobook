@@ -43,6 +43,15 @@ export const metadata: Metadata = {
     "hindiaudio",
   ],
   metadataBase: new URL("https://www.hindiaudiobook.com"),
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-icon", sizes: "180x180", type: "image/png" },
+    ],
+  },
   openGraph: {
     type: "website",
     locale: "hi_IN",
