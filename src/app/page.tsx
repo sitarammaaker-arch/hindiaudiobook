@@ -63,13 +63,13 @@ export default async function HomePage() {
             <Link href="/search"
               className="flex items-center bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group"
               style={{ border: "2px solid rgba(255,107,43,0.3)" }}>
-              <div className="flex items-center gap-2 flex-1 px-5 py-3.5">
+              <div className="flex items-center gap-2 flex-1 px-4 py-3.5 min-w-0">
                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="#FF6B2B" strokeWidth="2.5" viewBox="0 0 24 24">
                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                 </svg>
-                <span className="text-gray-400 text-sm">Atomic Habits, Rich Dad Poor Dad, Bhagavad Gita...</span>
+                <span className="text-gray-400 text-sm truncate">Atomic Habits, Rich Dad, Bhagavad Gita...</span>
               </div>
-              <div className="px-5 py-3.5 font-bold text-sm text-white flex-shrink-0 group-hover:brightness-110 transition-all"
+              <div className="px-4 py-3.5 font-bold text-sm text-white flex-shrink-0 group-hover:brightness-110 transition-all"
                 style={{ background: "#FF6B2B" }}>
                 Search Karein
               </div>
@@ -77,15 +77,15 @@ export default async function HomePage() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-wrap gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center px-2">
             <Link href="/free-hindi-audiobooks"
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-sm">
+              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-3 rounded-xl transition-all text-sm text-center">
               📚 {allBooks.length} Audiobooks Dekhein
             </Link>
             <a href="https://whatsapp.com/channel/0029VaFSHSB1dAw9L0JBGn0P" target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 font-semibold px-6 py-2.5 rounded-xl transition-all text-sm"
+              className="flex items-center justify-center gap-2 font-semibold px-6 py-3 rounded-xl transition-all text-sm"
               style={{ background: "#25D36618", border: "1px solid #25D36640", color: "#25D366" }}>
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.05 1.027C5.979 1.027 1.027 5.979 1.027 12.05c0 1.951.498 3.783 1.372 5.382L1.027 23l5.721-1.497c1.543.839 3.3 1.323 5.169 1.323h.003c6.071 0 11.023-4.952 11.023-11.023S18.121 1.027 12.05 1.027z"/>
               </svg>
               WhatsApp Join Karein
