@@ -43,12 +43,12 @@ export default async function ChapterPlayerPage({ params }: Props) {
 
   // Safe chapter object — fill missing fields
   const safeChapter = {
-    thumbnail: "",
-    description: "",
-    chapterNumber: currentIdx + 1,
-    isFree: true,
-    videoId: "",
     ...chapter,
+    thumbnail: chapter.thumbnail || "",
+    description: chapter.description || "",
+    chapterNumber: chapter.chapterNumber || currentIdx + 1,
+    isFree: chapter.isFree ?? true,
+    videoId: chapter.videoId || "",
     audioUrl: chapter.audioUrl || "",
   };
 
