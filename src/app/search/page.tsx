@@ -94,8 +94,15 @@ export default function SearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Book ka naam, author, ya topic likhein..."
-          className="w-full pl-12 pr-4 py-4 text-base border-2 border-gray-200 focus:border-[#FF6B2B] rounded-2xl outline-none transition-colors bg-white shadow-sm"
-          style={{ fontFamily: "var(--font-inter)" }}
+          className="w-full pl-12 pr-4 py-4 text-base rounded-2xl bg-white shadow-sm"
+          style={{
+            border: "1.5px solid #e5e7eb",
+            outline: "none",
+            boxShadow: "none",
+            transition: "border-color 0.2s",
+          }}
+          onFocus={(e) => e.target.style.borderColor = "#FF6B2B"}
+          onBlur={(e) => e.target.style.borderColor = "#e5e7eb"}
         />
         <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>

@@ -16,7 +16,7 @@ export default function HeroSearchForm() {
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto mb-6">
       <div className="flex items-center bg-white rounded-2xl overflow-hidden shadow-lg"
-        style={{ border: "2px solid rgba(255,107,43,0.4)" }}>
+        style={{ border: "1.5px solid rgba(255,107,43,0.35)" }}>
         <div className="flex items-center gap-2 flex-1 px-4 min-w-0">
           <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="#FF6B2B" strokeWidth="2.5" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -26,7 +26,8 @@ export default function HeroSearchForm() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Atomic Habits, Rich Dad, Bhagavad Gita..."
-            className="flex-1 py-3.5 text-sm text-gray-800 outline-none bg-transparent placeholder-gray-400 min-w-0"
+            className="flex-1 py-3.5 text-sm text-gray-800 bg-transparent placeholder-gray-400 min-w-0"
+            style={{ outline: "none", border: "none", boxShadow: "none" }}
           />
         </div>
         <button
