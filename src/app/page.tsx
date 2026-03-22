@@ -2,6 +2,7 @@ import Link from "next/link";
 import AudiobookCard from "@/components/AudiobookCard";
 import GoogleAd from "@/components/GoogleAd";
 import RecentlyListened from "@/components/RecentlyListened";
+import NewsletterForm from "@/components/NewsletterForm";
 import {
   getAllAudiobooks, getAllChapterBooks, getCategoryCounts, categories,
   type Audiobook, type ChapterBook,
