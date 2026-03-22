@@ -176,7 +176,7 @@ export default function ContactPage() {
             style={{ background: "#FF000015", color: "#FF0000", border: "1px solid #FF000030" }}>
             ▶ YouTube
           </a>
-          <a href="https://whatsapp.com/channel/0029VaFSHSB1dAw9L0JBGn0P" target="_blank" rel="noopener noreferrer"
+          <a href="https://whatsapp.com/channel/0029Vao7mKBBVJl7j5Bm2S3i" target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors"
             style={{ background: "#25D36615", color: "#25D366", border: "1px solid #25D36630" }}>
             💬 WhatsApp

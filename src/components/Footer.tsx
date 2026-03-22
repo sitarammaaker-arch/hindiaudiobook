@@ -30,7 +30,7 @@ export default function Footer() {
             <div className="flex gap-3 flex-wrap">
               {[
                 { label: "YouTube", href: "https://youtube.com/@hindiaudiobook", color: "#FF0000" },
-                { label: "WhatsApp", href: "https://whatsapp.com/channel/0029VaFSHSB1dAw9L0JBGn0P", color: "#25D366" },
+                { label: "WhatsApp", href: "https://whatsapp.com/channel/0029Vao7mKBBVJl7j5Bm2S3i", color: "#25D366" },
                 { label: "Telegram", href: "#", color: "#2CA5E0" },
                 { label: "Instagram", href: "#", color: "#E1306C" },
               ].map((s) => (

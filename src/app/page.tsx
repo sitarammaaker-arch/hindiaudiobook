@@ -73,7 +73,7 @@ export default async function HomePage() {
               className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-3 rounded-xl transition-all text-sm text-center">
               📚 {allBooks.length} Audiobooks Dekhein
             </Link>
-            <a href="https://whatsapp.com/channel/0029VaFSHSB1dAw9L0JBGn0P" target="_blank" rel="noopener noreferrer"
+            <a href="https://whatsapp.com/channel/0029Vao7mKBBVJl7j5Bm2S3i" target="_blank" rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 font-semibold px-6 py-3 rounded-xl transition-all text-sm"
               style={{ background: "#25D36618", border: "1px solid #25D36640", color: "#25D366" }}>
               <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
