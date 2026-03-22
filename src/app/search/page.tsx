@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import AudiobookCard from "@/components/AudiobookCard";
 import { categories, type Audiobook } from "@/data/audiobooks";
@@ -29,16 +29,21 @@ export default function SearchPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [duration, setDuration] = useState("all");
   const [sortBy, setSort]       = useState<"relevant"|"popular"|"newest">("relevant");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Check for URL param ?q=...
     const params = new URLSearchParams(window.location.search);
     const q = params.get("q");
     if (q) setQuery(q);
 
     fetch("/api/all-audiobooks")
       .then((r) => r.json())
-      .then((d) => { setAllBooks(d.data || []); setLoading(false); })
+      .then((d) => {
+        setAllBooks(d.data || []);
+        setLoading(false);
+        // Focus input after data loads — works on mobile too
+        setTimeout(() => inputRef.current?.focus(), 100);
+      })
       .catch(() => setLoading(false));
   }, []);
 
@@ -84,11 +89,11 @@ export default function SearchPage() {
       {/* Search input */}
       <div className="relative mb-4">
         <input
+          ref={inputRef}
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Book ka naam, author, ya topic likhein..."
-          autoFocus
           className="w-full pl-12 pr-4 py-4 text-base border-2 border-gray-200 focus:border-[#FF6B2B] rounded-2xl outline-none transition-colors bg-white shadow-sm"
           style={{ fontFamily: "var(--font-inter)" }}
         />
