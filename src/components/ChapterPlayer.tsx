@@ -238,7 +238,16 @@ export default function ChapterPlayer({
   return (
     <div className="bg-[#1A1A2E] rounded-2xl p-5 shadow-2xl text-white">
       {hasAudio && (
-        <audio ref={audioRef} src={chapter.audioUrl} preload="metadata" playsInline />
+        <audio ref={audioRef} preload="metadata" playsInline>
+          <source src={chapter.audioUrl} type={
+            chapter.audioUrl?.endsWith('.m4a') ? 'audio/mp4' :
+            chapter.audioUrl?.endsWith('.ogg') ? 'audio/ogg' :
+            chapter.audioUrl?.endsWith('.wav') ? 'audio/wav' :
+            'audio/mpeg'
+          } />
+          <source src={chapter.audioUrl} type="audio/mp4" />
+          <source src={chapter.audioUrl} type="audio/mpeg" />
+        </audio>
       )}
 
       {/* ── RESUME PROMPT ─────────────────────────────────────────────── */}
@@ -276,7 +285,11 @@ export default function ChapterPlayer({
       {/* Chapter info */}
       <div className="flex items-center gap-3 mb-5">
         <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 shadow-lg ring-2 ring-white/20">
-          <img src={chapter.thumbnail} alt={chapter.title} className="w-full h-full object-cover" loading="lazy" />
+          {chapter.thumbnail ? (
+            <img src={chapter.thumbnail} alt={chapter.title} className="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <div className="w-full h-full bg-[#FF6B2B]/30 flex items-center justify-center text-2xl">🎧</div>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">

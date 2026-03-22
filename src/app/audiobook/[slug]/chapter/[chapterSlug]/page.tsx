@@ -35,11 +35,22 @@ export default async function ChapterPlayerPage({ params }: Props) {
   const result = await getBookAndChapter(params.slug, params.chapterSlug);
   if (!result) notFound();
 
-  const { book, chapter, chapters } = result;
+  const { book, chapter, chapters } = result!;
   const currentIdx = chapters.findIndex((c: any) => c.slug === chapter.slug);
   const prev = currentIdx > 0 ? chapters[currentIdx - 1] : null;
   const next = currentIdx < chapters.length - 1 ? chapters[currentIdx + 1] : null;
   const category = categories.find((c) => c.slug === book.category);
+
+  // Safe chapter object — fill missing fields
+  const safeChapter = {
+    thumbnail: "",
+    description: "",
+    chapterNumber: currentIdx + 1,
+    isFree: true,
+    videoId: "",
+    ...chapter,
+    audioUrl: chapter.audioUrl || "",
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -59,7 +70,7 @@ export default async function ChapterPlayerPage({ params }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left: Player */}
         <div className="lg:col-span-2 space-y-6">
-          <ChapterPlayer chapter={chapter} book={book} prevChapter={prev} nextChapter={next} />
+          <ChapterPlayer chapter={safeChapter as any} book={book} prevChapter={prev} nextChapter={next} />
 
           {/* Chapter description */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
