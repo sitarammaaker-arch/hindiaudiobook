@@ -87,30 +87,33 @@ export default function SearchPage() {
       </p>
 
       {/* Search input */}
-      <div className="relative mb-4">
-        <input
-          ref={inputRef}
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Book ka naam, author, ya topic likhein..."
-          className="w-full pl-12 pr-4 py-4 text-base rounded-2xl bg-white shadow-sm"
-          style={{
-            border: "1.5px solid #e5e7eb",
-            outline: "none",
-            boxShadow: "none",
-            transition: "border-color 0.2s",
-          }}
-          onFocus={(e) => e.target.style.borderColor = "#FF6B2B"}
-          onBlur={(e) => e.target.style.borderColor = "#e5e7eb"}
-        />
-        <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        {query && (
-          <button onClick={() => setQuery("")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg">✕</button>
-        )}
+      <div className="flex items-center bg-white rounded-2xl overflow-hidden mb-4 shadow-sm"
+        style={{ border: "1.5px solid #e5e7eb" }}>
+        <div className="flex items-center flex-1 min-w-0 px-4">
+          <svg className="w-5 h-5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && inputRef.current?.blur()}
+            placeholder="Book ka naam, author, ya topic likhein..."
+            className="flex-1 pl-3 py-4 text-base bg-transparent min-w-0"
+            style={{ outline: "none", border: "none", boxShadow: "none" }}
+          />
+          {query && (
+            <button onClick={() => setQuery("")}
+              className="text-gray-400 hover:text-gray-600 text-lg flex-shrink-0 px-1">✕</button>
+          )}
+        </div>
+        <button
+          onClick={() => inputRef.current?.blur()}
+          className="px-5 py-4 font-bold text-sm text-white flex-shrink-0 hover:brightness-110 transition-all"
+          style={{ background: "#FF6B2B" }}>
+          Search
+        </button>
       </div>
 
       {/* Popular searches */}

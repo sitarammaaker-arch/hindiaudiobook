@@ -36,9 +36,14 @@ export default async function HomePage() {
 
   return (
     <main>
-      {/* ── Hero — Compact Dark Navy ── */}
-      <section className="relative overflow-hidden py-10 md:py-14"
-        style={{ background: "#1A1A2E" }}>
+      {/* ── Hero — Full screen mobile, compact desktop ── */}
+      <section
+        className="relative overflow-hidden flex items-center py-10 md:py-16"
+        style={{
+          background: "#1A1A2E",
+          minHeight: "calc(100svh - 60px)",
+        }}>
+        <div className="w-full">
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
 
@@ -78,6 +83,7 @@ export default async function HomePage() {
             </a>
           </div>
 
+        </div>
         </div>
       </section>
 
