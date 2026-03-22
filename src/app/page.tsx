@@ -3,6 +3,7 @@ import AudiobookCard from "@/components/AudiobookCard";
 import GoogleAd from "@/components/GoogleAd";
 import RecentlyListened from "@/components/RecentlyListened";
 import NewsletterForm from "@/components/NewsletterForm";
+import HeroSearchForm from "@/components/HeroSearchForm";
 import {
   getAllAudiobooks, getAllChapterBooks, getCategoryCounts, categories,
   type Audiobook, type ChapterBook,
@@ -58,23 +59,8 @@ export default async function HomePage() {
             Trading Psychology, Self Help, Spiritual — sabhi free mein sunein. Koi download nahi, koi signup nahi.
           </p>
 
-          {/* Search Bar */}
-          <div className="max-w-xl mx-auto mb-6">
-            <Link href="/search"
-              className="flex items-center bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group"
-              style={{ border: "2px solid rgba(255,107,43,0.3)" }}>
-              <div className="flex items-center gap-2 flex-1 px-4 py-3.5 min-w-0">
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="#FF6B2B" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                </svg>
-                <span className="text-gray-400 text-sm truncate">Atomic Habits, Rich Dad, Bhagavad Gita...</span>
-              </div>
-              <div className="px-4 py-3.5 font-bold text-sm text-white flex-shrink-0 group-hover:brightness-110 transition-all"
-                style={{ background: "#FF6B2B" }}>
-                Search Karein
-              </div>
-            </Link>
-          </div>
+          {/* Search Bar — Real Input */}
+          <HeroSearchForm />
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center px-2">
