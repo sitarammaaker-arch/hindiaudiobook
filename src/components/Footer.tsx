@@ -31,8 +31,7 @@ export default function Footer() {
               {[
                 { label: "YouTube", href: "https://youtube.com/@hindiaudiobook", color: "#FF0000" },
                 { label: "WhatsApp", href: "https://whatsapp.com/channel/0029Vao7mKBBVJl7j5Bm2S3i", color: "#25D366" },
-                { label: "Telegram", href: "#", color: "#2CA5E0" },
-                { label: "Instagram", href: "#", color: "#E1306C" },
+                { label: "Instagram", href: "https://instagram.com/hindiaudiobook_", color: "#E1306C" },
               ].map((s) => (
                 <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
                   className="text-xs font-medium px-3 py-1.5 rounded-lg transition-all hover:opacity-90"
