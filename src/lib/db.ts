@@ -3,6 +3,7 @@
 
 import fs from "fs";
 import path from "path";
+import { unstable_cache } from "next/cache";
 
 // ── Redis detection ────────────────────────────────────────────────────────
 function hasRedis(): boolean {
@@ -48,14 +49,26 @@ function writeLocalJSON<T>(filename: string, data: T[]): void {
 
 const kvKey = (filename: string) => "ha:" + filename.replace(".json", "");
 
+// ── Cached Redis read (avoids hitting Redis on every single request) ───────
+// unstable_cache is Next.js's recommended way to cache a non-fetch / no-store
+// data source. This does NOT touch any page's rendering mode, so it cannot
+// conflict with static/ISR generation the way page-level `revalidate` did.
+const getCachedRedisJSON = unstable_cache(
+  async (filename: string): Promise<any[]> => {
+    try {
+      const redis = await getRedis();
+      const data = await redis.get<any[]>(kvKey(filename));
+      return data ?? [];
+    } catch { return []; }
+  },
+  ["ha-redis-json"],
+  { revalidate: 60 }
+);
+
 // ── Public async API ───────────────────────────────────────────────────────
 export async function readJSONAsync<T>(filename: string): Promise<T[]> {
   if (hasRedis()) {
-    try {
-      const redis = await getRedis();
-      const data = await redis.get<T[]>(kvKey(filename));
-      return data ?? [];
-    } catch { return []; }
+    return (await getCachedRedisJSON(filename)) as T[];
   }
   return readLocalJSON<T>(filename);
 }
