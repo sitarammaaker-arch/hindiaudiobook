@@ -9,7 +9,8 @@ import {
   type Audiobook, type ChapterBook,
 } from "@/lib/data";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function HomePage() {
   let allBooks: Audiobook[] = [];
