@@ -14,8 +14,7 @@ import RecentlyListened from "@/components/RecentlyListened";
 import { getAllAudiobooks, getBookBySlug, getRelatedBooks, categories } from "@/lib/data";
 import { makeSlug } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 300;
 
 interface Props { params: { slug: string } }
 
