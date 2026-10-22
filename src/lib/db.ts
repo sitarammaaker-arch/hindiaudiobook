@@ -3,7 +3,7 @@
 
 import fs from "fs";
 import path from "path";
-import { unstable_cache } from "next/cache";
+import { unstable_cache, revalidateTag } from "next/cache";
 
 // ── Redis detection ────────────────────────────────────────────────────────
 function hasRedis(): boolean {
@@ -49,27 +49,47 @@ function writeLocalJSON<T>(filename: string, data: T[]): void {
 
 const kvKey = (filename: string) => "ha:" + filename.replace(".json", "");
 
-// ── Cached Redis read (avoids hitting Redis on every single request) ───────
-// unstable_cache is Next.js's recommended way to cache a non-fetch / no-store
-// data source. This does NOT touch any page's rendering mode, so it cannot
-// conflict with static/ISR generation the way page-level `revalidate` did.
-// Errors are NOT caught here: unstable_cache only stores successful results,
-// so a failed Redis read can't get cached as an empty list for 60s.
-const getCachedRedisJSON = unstable_cache(
-  async (filename: string): Promise<any[]> => {
-    const redis = await getRedis();
-    const data = await redis.get<any[]>(kvKey(filename));
-    return data ?? [];
-  },
-  ["ha-redis-json"],
-  { revalidate: 60 }
-);
+// ── Cached Redis reads (keeps Upstash bandwidth low) ───────────────────────
+// Every Redis read is served from Next's data cache (unstable_cache), tagged
+// with its Redis key. Writes call revalidateTag() for that key, so the cache
+// can stay long-lived and admin changes still show up immediately.
+// Free Upstash = 10 GB/month bandwidth; reading the full audiobooks JSON on
+// every request is what got the database suspended in Oct 2026.
+// Errors are NOT caught inside cached functions: unstable_cache only stores
+// successful results, so a failed read never gets cached as empty data.
+const JSON_CACHE_SECONDS = 3600;   // safety net; writes invalidate instantly
+const PLAYS_CACHE_SECONDS = 300;   // play counts may lag by up to 5 minutes
+
+const jsonCaches = new Map<string, () => Promise<any[]>>();
+
+function cachedRedisJSON(filename: string): () => Promise<any[]> {
+  const key = kvKey(filename);
+  let fn = jsonCaches.get(key);
+  if (!fn) {
+    fn = unstable_cache(
+      async (): Promise<any[]> => {
+        const redis = await getRedis();
+        const data = await redis.get<any[]>(key);
+        return data ?? [];
+      },
+      ["ha-redis-json", key],
+      { revalidate: JSON_CACHE_SECONDS, tags: [key] }
+    );
+    jsonCaches.set(key, fn);
+  }
+  return fn;
+}
+
+function invalidate(key: string): void {
+  try { revalidateTag(key); }
+  catch (e) { console.error(`[db] revalidateTag failed for ${key}:`, e); }
+}
 
 // ── Public async API ───────────────────────────────────────────────────────
 export async function readJSONAsync<T>(filename: string): Promise<T[]> {
   if (hasRedis()) {
     try {
-      return (await getCachedRedisJSON(filename)) as T[];
+      return (await cachedRedisJSON(filename)()) as T[];
     } catch (e) {
       console.error(`[db] Redis read failed for ${filename}:`, e);
       return [];
@@ -83,10 +103,11 @@ export async function writeJSONAsync<T>(filename: string, data: T[]): Promise<vo
     try {
       const redis = await getRedis();
       await redis.set(kvKey(filename), data);
-      return;
     } catch (e) {
       throw new Error("Database save failed: " + e);
     }
+    invalidate(kvKey(filename));
+    return;
   }
   writeLocalJSON(filename, data);
 }
@@ -105,28 +126,43 @@ export async function incrementPlay(slug: string): Promise<number> {
   return memPlays[slug];
 }
 
+// Not invalidated on incrementPlay — that would defeat the cache on every play.
+const getCachedPlays = unstable_cache(
+  async (): Promise<Record<string, number>> => {
+    const redis = await getRedis();
+    const data = await redis.hgetall("ha:plays");
+    if (!data) return {};
+    const result: Record<string, number> = {};
+    for (const [k, v] of Object.entries(data)) result[k] = Number(v);
+    return result;
+  },
+  ["ha-redis-plays"],
+  { revalidate: PLAYS_CACHE_SECONDS, tags: ["ha:plays"] }
+);
+
 export async function getAllPlays(): Promise<Record<string, number>> {
   if (hasRedis()) {
-    try {
-      const redis = await getRedis();
-      const data = await redis.hgetall("ha:plays");
-      if (!data) return {};
-      const result: Record<string, number> = {};
-      for (const [k, v] of Object.entries(data)) result[k] = Number(v);
-      return result;
-    } catch { return {}; }
+    try { return await getCachedPlays(); }
+    catch { return {}; }
   }
   return memPlays;
 }
 
 // ── Authors KV ────────────────────────────────────────────────────────────
+const getCachedAuthors = unstable_cache(
+  async (): Promise<any[] | null> => {
+    const redis = await getRedis();
+    const data = await redis.get<any[]>("ha:authors");
+    return data ?? null;
+  },
+  ["ha-redis-authors"],
+  { revalidate: JSON_CACHE_SECONDS, tags: ["ha:authors"] }
+);
+
 export async function getAllAuthorsFromKV(): Promise<any[] | null> {
   if (hasRedis()) {
-    try {
-      const redis = await getRedis();
-      const data = await redis.get<any[]>("ha:authors");
-      return data ?? null;
-    } catch { return null; }
+    try { return await getCachedAuthors(); }
+    catch { return null; }
   }
   return null;
 }
@@ -136,7 +172,8 @@ export async function saveAllAuthors(authors: any[]): Promise<void> {
     try {
       const redis = await getRedis();
       await redis.set("ha:authors", authors);
-    } catch {}
+    } catch { return; }
+    invalidate("ha:authors");
   }
 }
 
