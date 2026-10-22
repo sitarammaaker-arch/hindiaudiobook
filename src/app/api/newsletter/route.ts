@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readJSONAsync, writeJSONAsync } from "@/lib/db";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,9 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const subscribers = await readJSONAsync<Subscriber>("subscribers.json");
     return NextResponse.json({ success: true, count: subscribers.length, data: subscribers });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllAuthorsFromKV, saveAllAuthors, deleteAuthor } from "@/lib/db";
 import { SEED_AUTHORS, type Author } from "@/data/authors";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,8 @@ async function getAuthors(): Promise<Author[]> {
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { slug: string } }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const body = await req.json();
     const authors = await getAuthors();
@@ -31,7 +34,9 @@ export async function PUT(req: NextRequest, { params }: { params: { slug: string
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { slug: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { slug: string } }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     await deleteAuthor(params.slug);
     return NextResponse.json({ success: true, message: "Author delete ho gaye" });

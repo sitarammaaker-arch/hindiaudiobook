@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readJSONAsync, writeJSONAsync, nextId } from "@/lib/db";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,8 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 
 // POST — add chapter to book
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const body = await req.json();
     const books = await readJSONAsync<Book>("books.json");
@@ -58,7 +61,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 }
 
 // DELETE book
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const books = await readJSONAsync<Book>("books.json");
     const filtered = books.filter((b) => b.id !== Number(params.id));

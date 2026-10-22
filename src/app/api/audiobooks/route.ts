@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readJSONAsync, writeJSONAsync, nextId, makeSlug, extractVideoId, getAllAuthorsFromKV, saveAllAuthors } from "@/lib/db";
 import { SEED_AUTHORS } from "@/data/authors";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +57,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const body = await req.json();
     const { title, author, category, duration, videoIdRaw, audioUrl, trending, latest, description } = body;

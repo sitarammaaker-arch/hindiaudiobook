@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readJSONAsync, writeJSONAsync } from "@/lib/db";
+import { isAdminRequest } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -26,8 +27,13 @@ async function fetchYouTubeViews(videoIds: string[]): Promise<Record<string, num
 }
 
 export async function GET(req: NextRequest) {
+  // Allowed: admin session (manual refresh button), or CRON_SECRET via Vercel Cron's
+  // "Authorization: Bearer" header or ?secret=. Still open to anyone if CRON_SECRET is unset.
+  const cronSecret = process.env.CRON_SECRET;
   const secret = req.nextUrl.searchParams.get("secret");
-  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+  const bearer = req.headers.get("authorization");
+  const cronOk = !cronSecret || secret === cronSecret || bearer === `Bearer ${cronSecret}`;
+  if (!cronOk && !isAdminRequest(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {

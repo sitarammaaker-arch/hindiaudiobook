@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readJSONAsync, writeJSONAsync } from "@/lib/db";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,9 @@ type Audiobook = {
   latest: boolean; plays: number; audioUrl: string; createdAt: string;
 };
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const id = parseInt(params.id);
     const books = await readJSONAsync<Audiobook>("audiobooks.json");
@@ -26,6 +29,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const id = parseInt(params.id);
     const body = await req.json();
