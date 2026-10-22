@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { categories } from "@/data/audiobooks";
-import { summaries, readingMinutes } from "@/data/summaries";
+import { readingMinutes } from "@/data/summaries";
+import { getPublishedSummaries } from "@/lib/summaries";
+
+// New summaries go live daily at their publishAt time
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Book Summary in Hindi — मशहूर किताबों का सार हिंदी में",
@@ -9,7 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.hindiaudiobook.com/summary" },
 };
 
-export default function SummaryIndexPage() {
+export default async function SummaryIndexPage() {
+  const summaries = await getPublishedSummaries();
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-hindi">
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">

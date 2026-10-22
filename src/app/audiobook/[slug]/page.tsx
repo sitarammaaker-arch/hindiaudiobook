@@ -11,7 +11,7 @@ import YouTubeViewCount from "@/components/YouTubeViewCount";
 import TrackVisit from "@/components/TrackVisit";
 import RecentlyListened from "@/components/RecentlyListened";
 import { getBookBySlug, getRelatedBooks, categories, isIndexable } from "@/lib/data";
-import { getSummaryForAudiobook } from "@/data/summaries";
+import { getPublishedSummaryForAudiobook } from "@/lib/summaries";
 import { makeSlug } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -55,7 +55,7 @@ export default async function AudiobookDetailPage({ params }: Props) {
   const hasDirectAudio = Boolean(book.audioUrl?.trim());
   const authorName = book.author?.replace(/^by\s+/i, "") || book.author || "";
   const showAds = isIndexable(book); // no ads on thin (noindexed) pages
-  const summary = getSummaryForAudiobook(book.slug);
+  const summary = await getPublishedSummaryForAudiobook(book.slug);
 
   // Convert "8h 31m" → "PT8H31M" for schema.org
   const toISODuration = (d: string) => {

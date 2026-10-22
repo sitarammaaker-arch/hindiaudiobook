@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { categories } from "@/data/audiobooks";
-import { summaries, getSummaryBySlug, readingMinutes, SUMMARIES_UPDATED } from "@/data/summaries";
+import { readingMinutes } from "@/data/summaries";
 import { getBookBySlug } from "@/lib/data";
+import { getPublishedSummaries, getPublishedSummaryBySlug, publishedDate } from "@/lib/summaries";
 
 // Content is static (src/data/summaries), but the audiobook card reads Redis.
 // The Upstash client uses no-store fetches, which fail during static
@@ -15,12 +16,8 @@ const BASE = "https://www.hindiaudiobook.com";
 
 interface Props { params: { slug: string } }
 
-export async function generateStaticParams() {
-  return summaries.map((s) => ({ slug: s.slug }));
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const s = getSummaryBySlug(params.slug);
+  const s = await getPublishedSummaryBySlug(params.slug);
   if (!s) return {};
   return {
     title: s.seoTitle,
@@ -37,7 +34,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function SummaryPage({ params }: Props) {
-  const s = getSummaryBySlug(params.slug);
+  // Scheduled summaries 404 until their publishAt time
+  const s = await getPublishedSummaryBySlug(params.slug);
   if (!s) notFound();
 
   // Audiobook card is optional — the summary must render even if Redis is down
@@ -48,7 +46,8 @@ export default async function SummaryPage({ params }: Props) {
   const bgFrom = category?.bgFrom ?? "#1A1A2E";
   const bgTo = category?.bgTo ?? "#2F2F52";
   const minutes = readingMinutes(s);
-  const others = summaries.filter((o) => o.slug !== s.slug);
+  const others = (await getPublishedSummaries()).filter((o) => o.slug !== s.slug).slice(0, 6);
+  const published = publishedDate(s);
   const listenHref = `/audiobook/${s.audiobookSlug}`;
 
   const articleJsonLd = {
@@ -57,7 +56,8 @@ export default async function SummaryPage({ params }: Props) {
     "headline": s.seoTitle,
     "description": s.metaDescription,
     "inLanguage": "hi",
-    "dateModified": SUMMARIES_UPDATED,
+    "datePublished": published,
+    "dateModified": published,
     "url": `${BASE}/summary/${s.slug}`,
     "about": { "@type": "Book", "name": s.title, "author": { "@type": "Person", "name": s.author } },
     "publisher": { "@type": "Organization", "name": "HindiAudiobook.com", "url": BASE },

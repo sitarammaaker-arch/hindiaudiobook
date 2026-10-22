@@ -3,7 +3,7 @@ import { getAllAudiobooks, isIndexable } from "@/lib/data";
 import { categories } from "@/data/audiobooks";
 import { authors } from "@/data/authors";
 import { curatedLists } from "@/data/curated-lists";
-import { summaries } from "@/data/summaries";
+import { getPublishedSummaries, publishedDate } from "@/lib/summaries";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -48,8 +48,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const summaryPages = [
     { url: `${BASE}/summary`, priority: 0.8, changeFrequency: "weekly" as const },
-    ...summaries.map((s) => ({
+    ...(await getPublishedSummaries()).map((s) => ({
       url: `${BASE}/summary/${s.slug}`,
+      lastModified: publishedDate(s),
       priority: 0.8,
       changeFrequency: "monthly" as const,
     })),
