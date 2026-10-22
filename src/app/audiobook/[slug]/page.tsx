@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Script from "next/script";
 import AudiobookCard from "@/components/AudiobookCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import GoogleAd from "@/components/GoogleAd";
@@ -111,8 +110,9 @@ export default async function AudiobookDetailPage({ params }: Props) {
         thumbnail={book.thumbnail}
         category={book.category}
       />
-      <Script id="audio-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(audioJsonLd) }} />
-      <Script id="breadcrumb-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {/* Plain <script> (not next/script) so the JSON-LD is in the server HTML */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(audioJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6 flex-wrap">

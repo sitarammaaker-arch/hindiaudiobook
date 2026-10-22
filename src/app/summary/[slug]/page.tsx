@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Script from "next/script";
 import { categories } from "@/data/audiobooks";
 import { summaries, getSummaryBySlug, readingMinutes, SUMMARIES_UPDATED } from "@/data/summaries";
 import { getBookBySlug } from "@/lib/data";
 
-// Content is static (src/data/summaries); only the audiobook card reads Redis
-export const revalidate = 3600;
+// Content is static (src/data/summaries), but the audiobook card reads Redis.
+// The Upstash client uses no-store fetches, which fail during static
+// generation (the card came out empty), so render on request like the
+// audiobook pages; Redis reads are cached in lib/db.
+export const dynamic = "force-dynamic";
 
 const BASE = "https://www.hindiaudiobook.com";
 
@@ -81,9 +83,10 @@ export default async function SummaryPage({ params }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 font-hindi">
-      <Script id="summary-article-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
-      <Script id="summary-faq-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <Script id="summary-breadcrumb-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {/* Plain <script> (not next/script) so the JSON-LD is in the server HTML */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6 flex-wrap">
