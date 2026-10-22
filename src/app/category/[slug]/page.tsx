@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { categories, getBooksByCategory, toCardBook } from "@/lib/data";
+import { clampDescription } from "@/lib/seo";
 import CategoryClient from "./CategoryClient";
 
 export const dynamic = "force-dynamic";
@@ -8,10 +10,10 @@ interface Props { params: { slug: string } }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const category = categories.find((c) => c.slug === params.slug);
-  if (!category) return {};
+  if (!category) notFound();
   return {
     title: category.seoTitle || `${category.label} Hindi Audiobooks — Free`,
-    description: category.description,
+    description: clampDescription(`${category.description}. Free Hindi audiobooks, seedha browser mein sunein — download ya signup ki zaroorat nahi.`),
     alternates: { canonical: `https://www.hindiaudiobook.com/category/${category.slug}` },
   };
 }

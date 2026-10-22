@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: "%s | HindiAudiobook.com",
   },
   description:
-    "HindiAudiobook.com — India ka #1 free Hindi audiobook platform. 35+ Hindi audiobooks bilkul free — Trading Psychology, Rich Dad Poor Dad, Atomic Habits, Bhagavad Gita aur bahut kuch. Koi download nahi, koi signup nahi.",
+    "400+ free Hindi audiobooks — Rich Dad Poor Dad, Atomic Habits, Bhagavad Gita, trading psychology aur bahut kuch. Seedha browser mein sunein, koi signup nahi.",
   keywords: [
     // Top performing — exact match
     "hindi audiobook",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     siteName: "Hindi Audiobook",
     url: "https://www.hindiaudiobook.com",
     title: "Hindi Audiobook — Free Hindi Audiobooks Online Sunein",
-    description: "India ka #1 free Hindi audiobook platform. Hazaron audiobooks — kabhi bhi, kahin bhi sunein.",
+    description: "400+ free Hindi audiobooks — kabhi bhi, kahin bhi sunein.",
   },
   twitter: {
     card: "summary_large_image",

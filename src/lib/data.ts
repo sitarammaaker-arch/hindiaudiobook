@@ -49,6 +49,36 @@ export function isIndexable(book: Pick<Audiobook, "description">): boolean {
   return descriptionWordCount(book) >= MIN_INDEXABLE_WORDS;
 }
 
+// An author's books: listed in author.books, or matched by full name, or by
+// last name (e.g. "Douglas" matches "Mark Douglas").
+export function getBooksForAuthor(author: Author, allBooks: Audiobook[]): Audiobook[] {
+  const authorNameLower = author.name.toLowerCase();
+  const authorLastName = author.name.split(" ").pop()?.toLowerCase() || "";
+  return allBooks.filter((b) => {
+    const bookAuthor = b.author?.replace(/^by\s+/i, "").toLowerCase().trim() || "";
+    return (
+      author.books?.includes(b.slug) ||
+      bookAuthor === authorNameLower ||
+      (authorLastName.length > 3 && bookAuthor.includes(authorLastName))
+    );
+  });
+}
+
+// Authors added through the admin get a one-line template bio ("X ek popular
+// author hain…", sometimes with an "Admin se … Edit karein" note) until a real
+// one is written. That text says nothing about the author, so don't show it.
+const TEMPLATE_BIO = /ek popular author hain\. Inki audiobooks HindiAudiobook\.com par free mein available hain|Admin se is author ki bio update/i;
+
+export function hasRealBio(author: Author): boolean {
+  return !!author.fullBio && !TEMPLATE_BIO.test(author.fullBio);
+}
+
+// Index an author page only when it has its own text (a real bio) and links to
+// at least one indexable book; otherwise it is a thin page.
+export function isAuthorIndexable(author: Author, allBooks: Audiobook[]): boolean {
+  return hasRealBio(author) && getBooksForAuthor(author, allBooks).some(isIndexable);
+}
+
 // Listing pages pass books to client components; descriptions aren't shown on
 // cards, so drop them to keep the page payload small.
 export function toCardBook(book: Audiobook): Audiobook {

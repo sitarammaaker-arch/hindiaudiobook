@@ -18,7 +18,8 @@ interface Props { params: { slug: string } }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const s = await getPublishedSummaryBySlug(params.slug);
-  if (!s) return {};
+  if (!s) notFound();
+  const book = await getBookBySlug(s.audiobookSlug);
   return {
     title: s.seoTitle,
     description: s.metaDescription,
@@ -29,6 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `${BASE}/summary/${s.slug}`,
       type: "article",
       locale: "hi_IN",
+      ...(book?.thumbnail ? { images: [{ url: book.thumbnail, width: 480, height: 360, alt: s.title }] } : {}),
     },
   };
 }

@@ -19,7 +19,7 @@ export const curatedLists: CuratedList[] = [
     slug: "best-trading-psychology-books-hindi",
     title: "Best Trading Psychology Hindi Audiobooks",
     emoji: "📈",
-    seoTitle: "Best Trading Psychology Books Hindi — Top Audiobooks 2025",
+    seoTitle: "Best Trading Psychology Books Hindi — Top Audiobooks",
     description: "Stock market mein consistently profitable banne ke liye yeh books essential hain",
     longDescription: `Trading mein loss sirf galat analysis ki wajah se nahi hota — zyaadatar cases mein psychology galat hoti hai. Fear of missing out, revenge trading, overleveraging — yeh sab mental mistakes hain.
 
@@ -46,7 +46,7 @@ In sabhi books ko Hindi mein sunn kar aap woh mental framework develop kar sakte
     slug: "best-wealth-building-books-hindi",
     title: "Best Wealth Building Hindi Audiobooks",
     emoji: "💰",
-    seoTitle: "Best Wealth Building Books Hindi — Top Free Audiobooks 2025",
+    seoTitle: "Best Wealth Building Books Hindi — Top Free Audiobooks",
     description: "Financial freedom ke liye — Rich Dad se Psychology of Money tak — complete wealth education",
     longDescription: `School mein hume sirf ek hi raasta sikhaya jaata hai — padho, job lo, save karo, retire karo. Lekin yeh "Rat Race" hai jisme zyaadatar log poori zindagi struggle karte hain.
 
@@ -71,7 +71,7 @@ Yeh books milkar ek complete financial education deti hain — school mein jo ka
     slug: "best-self-help-hindi-audiobooks",
     title: "Best Self Help Hindi Audiobooks",
     emoji: "🔥",
-    seoTitle: "Best Self Help Hindi Audiobooks — Top Life Changing Books 2025",
+    seoTitle: "Best Self Help Hindi Audiobooks — Top Life Changing Books",
     description: "Atomic Habits, Ikigai, Think & Grow Rich — yeh books milkar aapki poori life transform kar sakti hain",
     longDescription: `Millions of people har saal self-help books khareedti hain lekin zyaadatar koi change nahi aata. Kyun? Kyunki galat books padhte hain, ya padh kar chhod dete hain.
 
@@ -100,7 +100,7 @@ Teeno books ko Hindi mein sun kar aap apni life ka direction set kar sakte hain.
     slug: "best-power-strategy-books-hindi",
     title: "Best Power & Strategy Hindi Audiobooks",
     emoji: "👑",
-    seoTitle: "Best Power & Strategy Books Hindi — 48 Laws of Power, Chanakya 2025",
+    seoTitle: "Best Power & Strategy Books Hindi — 48 Laws of Power, Chanakya",
     description: "48 Laws of Power aur Chanakya Neeti — power aur strategy ke timeless principles",
     longDescription: `Power dynamics real hain — office mein, society mein, everywhere. Jo log inhe samjhte hain woh aage jaate hain.
 
@@ -121,7 +121,7 @@ Peter Thiel ki "Zero to One" mein monopoly businesses ki power explain ki gayi h
     slug: "best-story-audiobooks-hindi",
     title: "Best Story Hindi Audiobooks",
     emoji: "📖",
-    seoTitle: "Best Hindi Story Audiobooks — Alchemist, Sapiens 2025",
+    seoTitle: "Best Hindi Story Audiobooks — Alchemist, Sapiens",
     description: "Inspiring stories jo sirf entertain nahi karti — sochne par bhi majboor karti hain",
     longDescription: `Kuch stories sirf time pass nahi karti — woh aapka perspective permanently change kar deti hain. Is list mein woh stories hain jinhone millions of people ki soch badli.
 
@@ -146,7 +146,7 @@ In books ko Hindi mein sun kar aap entertain bhi honge aur kuch deeply valuable 
     slug: "best-spiritual-audiobooks-hindi",
     title: "Best Spiritual Hindi Audiobooks",
     emoji: "🙏",
-    seoTitle: "Best Spiritual Hindi Audiobooks — Bhagavad Gita, Ramcharitmanas 2025",
+    seoTitle: "Best Spiritual Hindi Audiobooks — Bhagavad Gita, Ramcharitmanas",
     description: "Bhagavad Gita, Ramcharitmanas, Gyan Yoga — spiritual wisdom jo aapki aatma ko shanti de",
     longDescription: `India ki sabse pracheen aur powerful spiritual texts — ab Hindi audiobook format mein bilkul free.
 

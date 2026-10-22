@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About Us — HindiAudiobook.com | India ka #1 Free Hindi Audiobook Platform",
-  description: "HindiAudiobook.com ke baare mein jaanein. India ka #1 free Hindi audiobook platform — humara mission, team aur story.",
+  title: "About Us — Free Hindi Audiobook Platform",
+  description: "HindiAudiobook.com ke baare mein jaanein. Free Hindi audiobook platform — humara mission, team aur story.",
   alternates: { canonical: "https://www.hindiaudiobook.com/about" },
 };
 
@@ -34,7 +34,7 @@ export default function AboutPage() {
             </div>
             <h1 className="font-heading font-black text-3xl md:text-4xl mb-4"
               style={{ color: "#FFFFFF", letterSpacing: "-0.02em" }}>
-              India ka #1 Free Hindi Audiobook Platform
+              Free Hindi Audiobooks, Sabke Liye
             </h1>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: "rgba(255,255,255,0.75)", lineHeight: "1.7" }}>
               HindiAudiobook.com — jahan knowledge ko sunna free hai

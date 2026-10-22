@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 1800; // ISR: 30 min
 
 export const metadata: Metadata = {
-  title: "Hindi Audiobook Authors — Sabhi Lekhak | HindiAudiobook.com",
+  title: "Hindi Audiobook Authors — Sabhi Lekhak",
   description: "Mark Douglas, Robert Kiyosaki, Robert Greene, James Clear — sabhi famous authors ki Hindi audiobooks free mein sunein HindiAudiobook.com par.",
   alternates: { canonical: "https://www.hindiaudiobook.com/authors" },
 };

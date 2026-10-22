@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Script from "next/script";
 import AudiobookCard from "@/components/AudiobookCard";
 import { curatedLists, getCuratedListBySlug } from "@/data/curated-lists";
 import { getAllAudiobooks } from "@/lib/data";
 import { type Audiobook } from "@/data/audiobooks";
+import { clampDescription } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 1800; // ISR: 30 min
@@ -18,10 +18,10 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const list = getCuratedListBySlug(params.slug);
-  if (!list) return {};
+  if (!list) notFound();
   return {
-    title: `${list.seoTitle} | HindiAudiobook.com`,
-    description: list.description + " Sabhi free mein HindiAudiobook.com par sunein.",
+    title: list.seoTitle, // layout template adds "| HindiAudiobook.com"
+    description: clampDescription(`${list.description}. Sabhi free mein HindiAudiobook.com par sunein.`),
     alternates: { canonical: `https://www.hindiaudiobook.com/best/${list.slug}` },
   };
 }
@@ -53,7 +53,7 @@ export default async function CuratedListPage({ params }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <Script id="list-jsonld" type="application/ld+json"
+      <script type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
 
       {/* Breadcrumb */}

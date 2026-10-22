@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Script from "next/script";
 import AudiobookCard from "@/components/AudiobookCard";
-import { getAllAuthors, getAllAudiobooks } from "@/lib/data";
+import { getAllAuthors, getAllAudiobooks, getBooksForAuthor, hasRealBio, isAuthorIndexable } from "@/lib/data";
+import { clampDescription } from "@/lib/seo";
 import type { Author } from "@/data/authors";
 
 export const dynamic = "force-dynamic";
@@ -13,13 +13,14 @@ export const dynamicParams = true;
 interface Props { params: { slug: string } }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const authors = await getAllAuthors();
+  const [authors, allBooks] = await Promise.all([getAllAuthors(), getAllAudiobooks()]);
   const author = authors.find((a: Author) => a.slug === params.slug);
-  if (!author) return {};
+  if (!author) notFound();
   return {
-    title: `${author.name} — Hindi Audiobooks Free | HindiAudiobook.com`,
-    description: `${author.name} ki sabhi Hindi audiobooks free mein sunein. ${author.shortBio}`,
+    title: `${author.name} — Hindi Audiobooks Free`, // layout template adds the site name
+    description: clampDescription(`${author.name} ki sabhi Hindi audiobooks free mein sunein. ${author.shortBio}`),
     alternates: { canonical: `https://www.hindiaudiobook.com/author/${author.slug}` },
+    ...(isAuthorIndexable(author, allBooks) ? {} : { robots: { index: false, follow: true } }),
   };
 }
 
@@ -40,21 +41,7 @@ export default async function AuthorPage({ params }: Props) {
   const author = authors.find((a: Author) => a.slug === params.slug);
   if (!author) notFound();
 
-  // Auto-match books — 3 ways:
-  // 1. Author ke books[] array mein slug match
-  // 2. Book ke author field mein exact name match
-  // 3. Book ke author field mein partial last name match (e.g. "Douglas" matches "Mark Douglas")
-  const authorNameLower = author!.name.toLowerCase();
-  const authorLastName = author!.name.split(" ").pop()?.toLowerCase() || "";
-
-  const authorBooks = allBooks.filter((b) => {
-    const bookAuthor = b.author?.replace(/^by\s+/i, "").toLowerCase().trim() || "";
-    return (
-      author!.books?.includes(b.slug) ||
-      bookAuthor === authorNameLower ||
-      (authorLastName.length > 3 && bookAuthor.includes(authorLastName))
-    );
-  });
+  const authorBooks = getBooksForAuthor(author!, allBooks);
 
   const initials = author.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
   const avatarColor = avatarColors[author.slug] ?? { bg: "#F1EFE8", text: "#5F5E5A" };
@@ -72,7 +59,7 @@ export default async function AuthorPage({ params }: Props) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <Script id="author-jsonld" type="application/ld+json"
+      <script type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
 
       {/* Breadcrumb */}
@@ -131,14 +118,16 @@ export default async function AuthorPage({ params }: Props) {
 
         {/* Right: Bio + Books */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900 mb-5">{author.name} ke baare mein</h2>
-            <div className="text-gray-700 leading-relaxed space-y-4">
-              {(author.fullBio || author.shortBio || "").split("\n\n").map((para: string, i: number) => (
-                <p key={i}>{para}</p>
-              ))}
+          {hasRealBio(author) && (
+            <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
+              <h2 className="text-xl font-bold text-gray-900 mb-5">{author.name} ke baare mein</h2>
+              <div className="text-gray-700 leading-relaxed space-y-4">
+                {author.fullBio!.split("\n\n").map((para: string, i: number) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-5">
@@ -152,7 +141,7 @@ export default async function AuthorPage({ params }: Props) {
               </div>
             ) : (
               <div className="bg-gray-50 rounded-2xl p-8 text-center border border-gray-100">
-                <p className="text-gray-500">Jaldi add hogi — Admin se upload karein!</p>
+                <p className="text-gray-500">Is lekhak ki audiobooks jaldi aayengi.</p>
               </div>
             )}
           </div>

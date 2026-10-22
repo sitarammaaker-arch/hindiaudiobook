@@ -1,7 +1,6 @@
 import { MetadataRoute } from "next";
-import { getAllAudiobooks, isIndexable } from "@/lib/data";
+import { getAllAudiobooks, getAllAuthors, isIndexable, isAuthorIndexable } from "@/lib/data";
 import { categories } from "@/data/audiobooks";
-import { authors } from "@/data/authors";
 import { curatedLists } from "@/data/curated-lists";
 import { getPublishedSummaries, publishedDate } from "@/lib/summaries";
 
@@ -11,7 +10,7 @@ export const revalidate = 0;
 const BASE = "https://www.hindiaudiobook.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const allBooks = await getAllAudiobooks();
+  const [allBooks, authors] = await Promise.all([getAllAudiobooks(), getAllAuthors()]);
 
   const staticPages = [
     { url: BASE, priority: 1.0, changeFrequency: "daily" as const },
@@ -34,7 +33,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "daily" as const,
   }));
 
-  const authorPages = authors.map((a) => ({
+  // All authors live in Redis now (the static list only has the first 9);
+  // authors whose books are all noindexed are thin pages, so leave them out
+  const authorPages = authors.filter((a) => isAuthorIndexable(a, allBooks)).map((a) => ({
     url: `${BASE}/author/${a.slug}`,
     priority: 0.7,
     changeFrequency: "weekly" as const,

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 1800; // ISR: 30 min
 
 export const metadata: Metadata = {
-  title: "Best Hindi Audiobooks Lists — Top Curated Collections | HindiAudiobook.com",
+  title: "Best Hindi Audiobooks Lists — Top Curated Collections",
   description: "Best trading psychology, wealth, self-help, power & story Hindi audiobooks. Expert-curated lists — free mein sunein.",
   alternates: { canonical: "https://www.hindiaudiobook.com/best" },
 };

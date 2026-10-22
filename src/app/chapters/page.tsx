@@ -43,7 +43,7 @@ export default async function ChaptersPage() {
         <div className="text-center py-20">
           <div className="text-5xl mb-4">📖</div>
           <p className="text-gray-500 text-xl">Abhi koi chapter book nahi hai</p>
-          <p className="text-gray-400 text-sm mt-2">Admin se add karein</p>
+          <p className="text-gray-400 text-sm mt-2">Chapter wise audiobooks jaldi aayengi</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -13,6 +13,7 @@ import RecentlyListened from "@/components/RecentlyListened";
 import { getBookBySlug, getRelatedBooks, categories, isIndexable } from "@/lib/data";
 import { getPublishedSummaryForAudiobook } from "@/lib/summaries";
 import { makeSlug } from "@/lib/utils";
+import { clampDescription } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -25,12 +26,15 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const book = await getBookBySlug(params.slug);
-  if (!book) return {};
+  if (!book) notFound();
   const cat = categories.find((c) => c.slug === book.category);
   const authorName = book.author?.replace(/^by\s+/i, "") || book.author || "";
+  // Most titles already end in "Hindi Audiobook"; don't say it twice
+  const bookTitle = /hindi/i.test(book.title) ? book.title : `${book.title} Hindi Audiobook`;
+  const withAuthor = `${bookTitle} — ${authorName}`;
   return {
-    title: `${book.title} — ${authorName} Free Hindi Audiobook`,
-    description: `${book.title} by ${authorName} sunein bilkul free — HindiAudiobook.com. ${book.duration} ki yeh ${cat?.label || book.category} hindi audiobook. Download ki zaroorat nahi, seedha browser mein play karein.`,
+    title: authorName && withAuthor.length <= 60 ? withAuthor : bookTitle,
+    description: clampDescription(`${book.title} by ${authorName} free mein sunein. ${book.duration} ki ${cat?.label || book.category} Hindi audiobook, seedha browser mein play karein — download ki zaroorat nahi.`),
     alternates: { canonical: `https://www.hindiaudiobook.com/audiobook/${book.slug}` },
     // Thin pages: keep out of Google until a real description is written
     ...(isIndexable(book) ? {} : { robots: { index: false, follow: true } }),
