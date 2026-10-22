@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/adminAuth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type ArchiveFile = {
@@ -77,6 +78,8 @@ function stripHtml(html: string): string {
 
 // ─── Main handler ─────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const { url } = await req.json();
 

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAdminRequest } from "@/lib/adminAuth";
 
-const COOKIE_NAME = "admin_session";
-const SESSION_TOKEN = process.env.SESSION_SECRET || "hindiaudiobook_admin_2024";
 const LOGIN_PAGE = "/admin/login";
 const PUBLIC_ADMIN_PATHS = ["/admin/login"];
 
@@ -19,9 +18,7 @@ export function middleware(req: NextRequest) {
   }
 
   // Check session cookie
-  const session = req.cookies.get(COOKIE_NAME)?.value;
-
-  if (session !== SESSION_TOKEN) {
+  if (!isAdminRequest(req)) {
     // Redirect to login with return URL
     const loginUrl = new URL(LOGIN_PAGE, req.url);
     loginUrl.searchParams.set("from", pathname);

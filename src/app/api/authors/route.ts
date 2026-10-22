@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllAuthorsFromKV, saveAllAuthors } from "@/lib/db";
 import { SEED_AUTHORS, makeAuthorSlug, type Author } from "@/data/authors";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const body = await req.json();
     const { name, nationality, born, died, genre, shortBio, fullBio, famousFor, books, wikipedia } = body;

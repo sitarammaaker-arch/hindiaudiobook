@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readJSONAsync, writeJSONAsync, nextId, makeSlug, extractVideoId, getAllAuthorsFromKV, saveAllAuthors } from "@/lib/db";
 import { SEED_AUTHORS } from "@/data/authors";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,8 @@ async function ensureAuthorExists(authorName: string, bookSlug: string, authors:
 }
 
 export async function POST(req: NextRequest) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const { books: rawBooks } = await req.json();
     if (!Array.isArray(rawBooks) || rawBooks.length === 0) {

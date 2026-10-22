@@ -1,12 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { saveAllAuthors, getAllAuthorsFromKV, readJSONAsync, makeSlug } from "@/lib/db";
 import { SEED_AUTHORS } from "@/data/authors";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
 type Audiobook = { slug: string; author: string; };
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     // Get existing KV authors (or start with seed)
     let authors: any[] = (await getAllAuthorsFromKV()) ?? [...SEED_AUTHORS];

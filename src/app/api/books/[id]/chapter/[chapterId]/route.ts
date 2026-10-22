@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readJSONAsync, writeJSONAsync } from "@/lib/db";
+import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -7,9 +8,11 @@ type Chapter = { id: number; [key: string]: unknown };
 type Book = { id: number; chapters: Chapter[]; totalChapters: number; [key: string]: unknown };
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string; chapterId: string } }
 ) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const books = await readJSONAsync<Book>("books.json");
     const bookId = Number(params.id);

@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ADMIN_COOKIE_NAME as COOKIE_NAME, ADMIN_SESSION_TOKEN as SESSION_TOKEN } from "@/lib/adminAuth";
 
 // ── Password is stored as env var ─────────────────────────────────────────
 // Set ADMIN_PASSWORD in your .env.local or Vercel environment variables
 // Default password: admin123 (CHANGE THIS before deploying!)
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin@hindiaudiobook";
-const COOKIE_NAME = "admin_session";
-// Simple session token — in production use a proper random token
-const SESSION_TOKEN = process.env.SESSION_SECRET || "hindiaudiobook_admin_2024";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +31,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 60 * 60 * 24, // 24 hours
-      path: "/admin",
+      path: "/", // must reach /api/* too, which checks it via requireAdmin
     });
 
     return response;
@@ -45,6 +43,9 @@ export async function POST(req: NextRequest) {
 export async function DELETE() {
   // Logout — clear cookie
   const response = NextResponse.json({ success: true, message: "Logout ho gaye" });
-  response.cookies.delete(COOKIE_NAME);
+  // Clear both the current cookie (path "/") and the one older logins set on "/admin".
+  // Raw headers because response.cookies keeps only one entry per name.
+  response.headers.append("Set-Cookie", `${COOKIE_NAME}=; Path=/; Max-Age=0`);
+  response.headers.append("Set-Cookie", `${COOKIE_NAME}=; Path=/admin; Max-Age=0`);
   return response;
 }
