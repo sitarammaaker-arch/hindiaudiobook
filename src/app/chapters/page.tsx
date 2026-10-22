@@ -1,19 +1,22 @@
-"use client";
-import { useState, useEffect } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { categories, type Audiobook } from "@/data/audiobooks";
+import { categories } from "@/data/audiobooks";
 import { type ChapterBook } from "@/data/chapters";
+import { readJSONAsync } from "@/lib/db";
 
-export default function ChaptersPage() {
-  const [books, setBooks] = useState<ChapterBook[]>([]);
-  const [loading, setLoading] = useState(true);
+export const dynamic = "force-dynamic";
 
-  useEffect(() => {
-    fetch("/api/books")
-      .then((r) => r.json())
-      .then((d) => { setBooks(d.data || []); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, []);
+export const metadata: Metadata = {
+  title: "Chapter Wise Hindi Audiobooks — Free",
+  description: "Hindi audiobooks chapter by chapter sunein — apni speed se, jahan chhoda wahin se shuru karein.",
+  alternates: { canonical: "https://www.hindiaudiobook.com/chapters" },
+};
+
+// Server component (was client-fetched, so crawlers saw an empty page).
+// Same source as GET /api/books.
+export default async function ChaptersPage() {
+  let books: ChapterBook[] = [];
+  try { books = await readJSONAsync<ChapterBook>("books.json"); } catch {}
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -31,24 +34,12 @@ export default function ChaptersPage() {
             Chapter Wise Hindi Audiobooks
           </h1>
           <p className="text-white/70">
-            {loading ? "..." : `${books.length} books`} — chapter by chapter sunein
+            {books.length} books — chapter by chapter sunein
           </p>
         </div>
       </div>
 
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100">
-              <div className="aspect-video bg-gray-100 animate-pulse" />
-              <div className="p-4 space-y-2">
-                <div className="h-4 bg-gray-100 animate-pulse rounded w-4/5" />
-                <div className="h-3 bg-gray-100 animate-pulse rounded w-1/2" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : books.length === 0 ? (
+      {books.length === 0 ? (
         <div className="text-center py-20">
           <div className="text-5xl mb-4">📖</div>
           <p className="text-gray-500 text-xl">Abhi koi chapter book nahi hai</p>

@@ -11,7 +11,7 @@ import StickyPlayer from "@/components/StickyPlayer";
 import YouTubeViewCount from "@/components/YouTubeViewCount";
 import TrackVisit from "@/components/TrackVisit";
 import RecentlyListened from "@/components/RecentlyListened";
-import { getAllAudiobooks, getBookBySlug, getRelatedBooks, categories } from "@/lib/data";
+import { getBookBySlug, getRelatedBooks, categories, isIndexable } from "@/lib/data";
 import { makeSlug } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${book.title} — ${authorName} Free Hindi Audiobook`,
     description: `${book.title} by ${authorName} sunein bilkul free — HindiAudiobook.com. ${book.duration} ki yeh ${cat?.label || book.category} hindi audiobook. Download ki zaroorat nahi, seedha browser mein play karein.`,
     alternates: { canonical: `https://www.hindiaudiobook.com/audiobook/${book.slug}` },
+    // Thin pages: keep out of Google until a real description is written
+    ...(isIndexable(book) ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${book.title} — Hindi Audiobook Free`,
       description: `${authorName} ki yeh ${book.duration} ki audiobook free mein sunein — HindiAudiobook.com`,
@@ -52,6 +54,7 @@ export default async function AudiobookDetailPage({ params }: Props) {
   const category = categories.find((c) => c.slug === categorySlug);
   const hasDirectAudio = Boolean(book.audioUrl?.trim());
   const authorName = book.author?.replace(/^by\s+/i, "") || book.author || "";
+  const showAds = isIndexable(book); // no ads on thin (noindexed) pages
 
   // Convert "8h 31m" → "PT8H31M" for schema.org
   const toISODuration = (d: string) => {
@@ -171,7 +174,7 @@ export default async function AudiobookDetailPage({ params }: Props) {
             </p>
           </div>
 
-          <GoogleAd slot="1234567890" />
+          {showAds && <GoogleAd slot="1234567890" />}
 
           {/* Description */}
           {book.description && (
@@ -255,9 +258,9 @@ export default async function AudiobookDetailPage({ params }: Props) {
           </div>
 
           {/* Star rating */}
-          <StarRating audiobookSlug={book.slug} audiobookTitle={book.title} author={authorName} />
+          <StarRating audiobookSlug={book.slug} />
 
-          <GoogleAd slot="0987654321" />
+          {showAds && <GoogleAd slot="0987654321" />}
         </div>
       </div>
 

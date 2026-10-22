@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { getAllAudiobooks } from "@/lib/data";
+import { getAllAudiobooks, isIndexable } from "@/lib/data";
 import { categories } from "@/data/audiobooks";
 import { authors } from "@/data/authors";
 import { curatedLists } from "@/data/curated-lists";
@@ -18,7 +18,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/chapters`, priority: 0.8, changeFrequency: "weekly" as const },
     { url: `${BASE}/best`, priority: 0.8, changeFrequency: "weekly" as const },
     { url: `${BASE}/authors`, priority: 0.7, changeFrequency: "weekly" as const },
-    { url: `${BASE}/search`, priority: 0.6, changeFrequency: "weekly" as const },
     { url: `${BASE}/about`, priority: 0.5, changeFrequency: "monthly" as const },
     { url: `${BASE}/faq`, priority: 0.5, changeFrequency: "monthly" as const },
     { url: `${BASE}/contact`, priority: 0.4, changeFrequency: "monthly" as const },
@@ -46,7 +45,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly" as const,
   }));
 
-  const bookPages = allBooks.map((b) => ({
+  // Thin (noindexed) audiobook pages are left out — see isIndexable()
+  const bookPages = allBooks.filter(isIndexable).map((b) => ({
     url: `${BASE}/audiobook/${b.slug}`,
     priority: 0.9,
     changeFrequency: "weekly" as const,

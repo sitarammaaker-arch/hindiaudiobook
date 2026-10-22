@@ -35,6 +35,26 @@ export async function getAllChapterBooks(): Promise<ChapterBook[]> {
   }
 }
 
+// ── Content quality (AdSense / SEO) ────────────────────────────────────────
+// Pages with only a few words of our own text are "low-value content" for
+// AdSense. They stay playable, but are noindexed, left out of the sitemap and
+// get no manual ad units until a proper description is written.
+export const MIN_INDEXABLE_WORDS = 100;
+
+export function descriptionWordCount(book: Pick<Audiobook, "description">): number {
+  return (book.description || "").split(/\s+/).filter(Boolean).length;
+}
+
+export function isIndexable(book: Pick<Audiobook, "description">): boolean {
+  return descriptionWordCount(book) >= MIN_INDEXABLE_WORDS;
+}
+
+// Listing pages pass books to client components; descriptions aren't shown on
+// cards, so drop them to keep the page payload small.
+export function toCardBook(book: Audiobook): Audiobook {
+  return { ...book, description: "" };
+}
+
 // ── Filtered queries ───────────────────────────────────────────────────────
 export async function getBooksByCategory(slug: string): Promise<Audiobook[]> {
   try {

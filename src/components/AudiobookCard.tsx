@@ -39,48 +39,24 @@ function formatViews(n: number): string {
   return n.toString();
 }
 
-function getRating(slug: string): { avg: number; total: number } | null {
-  try {
-    const seeds: Record<string, { total: number; score: number }> = {
-      "trading-in-the-zone-full-hindi-audiobook":    { total: 203, score: 940 },
-      "the-disciplined-trader-hindi-audiobook":       { total: 247, score: 1141 },
-      "the-intelligent-investor-hindi-audiobook":     { total: 178, score: 818 },
-      "rich-dad-poor-dad-hindi-audiobook":            { total: 412, score: 1895 },
-      "48-laws-of-power-hindi-audiobook":             { total: 334, score: 1503 },
-      "atomic-habits-hindi-audiobook":                { total: 445, score: 2047 },
-      "the-alchemist-hindi-audiobook":                { total: 389, score: 1790 },
-      "think-and-grow-rich-hindi-audiobook":          { total: 312, score: 1434 },
-      "bhagawad-geeta-hindi-audiobook":               { total: 521, score: 2424 },
-      "zero-to-one-hindi-audiobook":                  { total: 134, score: 590 },
-    };
-    const stored = localStorage.getItem(`rating_${slug}`);
-    if (stored) {
-      const d = JSON.parse(stored);
-      if (d.totalRatings > 0) return { avg: d.avgRating, total: d.totalRatings };
-    }
-    const seed = seeds[slug];
-    if (seed) return { avg: Math.round((seed.score / seed.total) * 10) / 10, total: seed.total };
-    return null;
-  } catch { return null; }
-}
-
 export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
   const category = categories.find((c) => c.slug === audiobook.category?.trim());
   const authorName = audiobook.author?.replace(/^by\s+/i, "") || "";
   const authorSlug = makeSlug(authorName);
-  const [rating, setRating] = useState<{ avg: number; total: number } | null>(null);
   const [ytViews, setYtViews] = useState<number | null>(null);
 
   useEffect(() => {
-    setRating(getRating(audiobook.slug));
     getYtViews().then((views) => {
       const v = views[audiobook.videoId];
       if (v) setYtViews(v);
     });
   }, [audiobook.slug, audiobook.videoId]);
 
+  // Not one big <Link>: the author link inside would be an <a> nested in an <a>
+  // (invalid HTML, breaks hydration now that cards are server-rendered). The
+  // title link's ::after covers the whole card instead, author link sits above it.
   return (
-    <Link href={`/audiobook/${audiobook.slug}`} className="group block">
+    <div className="group block relative">
       <div className="card overflow-hidden bg-white" style={{ borderRadius: "16px" }}>
 
         {/* Thumbnail */}
@@ -116,23 +92,16 @@ export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
         {/* Content */}
         <div className="p-4">
           <h3 className="font-heading font-bold text-sm leading-snug line-clamp-2 mb-1 card-title-hover" style={{ letterSpacing: "-0.01em" }}>
-            {audiobook.title}
+            <Link href={`/audiobook/${audiobook.slug}`} className="after:absolute after:inset-0 after:z-[4]">
+              {audiobook.title}
+            </Link>
           </h3>
           <p className="text-xs mb-2" style={{ color: "#9CA3AF" }}>
             by{" "}
-            <Link href={`/author/${authorSlug}`} onClick={(e) => e.stopPropagation()} className="hover:text-[#FF6B2B] transition-colors">
+            <Link href={`/author/${authorSlug}`} className="relative z-[5] hover:text-[#FF6B2B] transition-colors">
               {authorName}
             </Link>
           </p>
-
-          {/* Star rating */}
-          {rating && (
-            <div className="flex items-center gap-1 mb-2">
-              <span className="text-yellow-400 text-xs">{"★".repeat(Math.round(rating.avg))}{"☆".repeat(5 - Math.round(rating.avg))}</span>
-              <span className="text-xs font-medium text-gray-600">{rating.avg.toFixed(1)}</span>
-              <span className="text-xs text-gray-400">({rating.total > 999 ? (rating.total/1000).toFixed(1)+"K" : rating.total})</span>
-            </div>
-          )}
 
           <div className="flex items-center justify-between gap-2">
             {/* YouTube views */}
@@ -163,6 +132,6 @@ export default function AudiobookCard({ audiobook }: { audiobook: Audiobook }) {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

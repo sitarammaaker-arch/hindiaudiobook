@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import AudiobookCard from "@/components/AudiobookCard";
 import GoogleAd from "@/components/GoogleAd";
@@ -11,6 +12,10 @@ import {
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "https://www.hindiaudiobook.com" },
+};
 
 export default async function HomePage() {
   let allBooks: Audiobook[] = [];

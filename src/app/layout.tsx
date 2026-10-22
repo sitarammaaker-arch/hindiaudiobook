@@ -66,12 +66,8 @@ export const metadata: Metadata = {
     title: "Hindi Audiobook — Free Hindi Audiobooks Online",
     description: "Free Hindi audiobooks sunein — HindiAudiobook.com",
   },
-  alternates: {
-    canonical: "https://www.hindiaudiobook.com",
-    languages: {
-      "hi-IN": "https://www.hindiaudiobook.com",
-    },
-  },
+  // No canonical here: child pages inherit it, so every page without its own
+  // canonical pointed at the homepage. Each page sets its own instead.
   // Add your Google Search Console verification code below
   // verification: { google: "your-verification-code-here" },
   robots: {

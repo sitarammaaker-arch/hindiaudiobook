@@ -29,6 +29,11 @@ const adStyles: Record<AdSlotType, { style: Record<string, string>; format?: str
   "in-feed":   { style: { display: "block" }, format: "fluid" },
 };
 
+// Dummy slot IDs still used in the pages. Real ad units can only be created
+// after AdSense approval — until then these render nothing (Auto Ads from the
+// script in layout.tsx still work). Replace them with real slot IDs later.
+const PLACEHOLDER_SLOTS = new Set(["1234567890", "0987654321", "1122334455"]);
+
 export default function GoogleAd({
   slot,
   type = "responsive",
@@ -37,10 +42,12 @@ export default function GoogleAd({
 }: GoogleAdProps) {
   const adRef = useRef<HTMLModElement>(null);
   const pushed = useRef(false);
+  const isPlaceholder = PLACEHOLDER_SLOTS.has(slot);
 
   useEffect(() => {
     // Don't push ads in development (avoids AdSense errors during dev)
     if (process.env.NODE_ENV === "development") return;
+    if (isPlaceholder) return;
     if (pushed.current) return;
 
     try {
@@ -52,6 +59,9 @@ export default function GoogleAd({
       console.error("AdSense error:", e);
     }
   }, []);
+
+  // Empty "Advertisement" boxes look broken to visitors and reviewers
+  if (isPlaceholder && process.env.NODE_ENV !== "development") return null;
 
   const config = adStyles[type];
 
