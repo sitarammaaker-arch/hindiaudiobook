@@ -3,6 +3,7 @@ import { getAllAudiobooks, isIndexable } from "@/lib/data";
 import { categories } from "@/data/audiobooks";
 import { authors } from "@/data/authors";
 import { curatedLists } from "@/data/curated-lists";
+import { summaries } from "@/data/summaries";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -45,6 +46,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly" as const,
   }));
 
+  const summaryPages = [
+    { url: `${BASE}/summary`, priority: 0.8, changeFrequency: "weekly" as const },
+    ...summaries.map((s) => ({
+      url: `${BASE}/summary/${s.slug}`,
+      priority: 0.8,
+      changeFrequency: "monthly" as const,
+    })),
+  ];
+
   // Thin (noindexed) audiobook pages are left out — see isIndexable()
   const bookPages = allBooks.filter(isIndexable).map((b) => ({
     url: `${BASE}/audiobook/${b.slug}`,
@@ -57,6 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...categoryPages,
     ...authorPages,
     ...bestPages,
+    ...summaryPages,
     ...bookPages,
   ];
 }

@@ -12,6 +12,7 @@ import YouTubeViewCount from "@/components/YouTubeViewCount";
 import TrackVisit from "@/components/TrackVisit";
 import RecentlyListened from "@/components/RecentlyListened";
 import { getBookBySlug, getRelatedBooks, categories, isIndexable } from "@/lib/data";
+import { getSummaryForAudiobook } from "@/data/summaries";
 import { makeSlug } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -55,6 +56,7 @@ export default async function AudiobookDetailPage({ params }: Props) {
   const hasDirectAudio = Boolean(book.audioUrl?.trim());
   const authorName = book.author?.replace(/^by\s+/i, "") || book.author || "";
   const showAds = isIndexable(book); // no ads on thin (noindexed) pages
+  const summary = getSummaryForAudiobook(book.slug);
 
   // Convert "8h 31m" → "PT8H31M" for schema.org
   const toISODuration = (d: string) => {
@@ -173,6 +175,19 @@ export default async function AudiobookDetailPage({ params }: Props) {
               </Link>
             </p>
           </div>
+
+          {summary && (
+            <Link href={`/summary/${summary.slug}`}
+              className="flex items-center gap-3 rounded-2xl p-4 border transition-shadow hover:shadow-md"
+              style={{ background: "#FFF8F5", borderColor: "rgba(255,107,43,0.25)" }}>
+              <span className="text-2xl">📖</span>
+              <span className="flex-1">
+                <span className="block font-bold text-gray-900">{summary.title} — Hindi Summary पढ़ें</span>
+                <span className="block text-sm text-gray-500">{summary.lessons.length} मुख्य सबक, आसान हिंदी में</span>
+              </span>
+              <span className="font-semibold text-sm" style={{ color: "#FF6B2B" }}>पढ़ें →</span>
+            </Link>
+          )}
 
           {showAds && <GoogleAd slot="1234567890" />}
 

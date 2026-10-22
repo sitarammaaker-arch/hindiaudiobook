@@ -1,5 +1,5 @@
 /* ── Google Fonts — Inter (body) + Merriweather (headings) ───────────────── */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700;900&family=Noto+Serif+Devanagari:wght@700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700;900&family=Noto+Serif+Devanagari:wght@700;900&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -110,6 +110,10 @@ a { text-decoration: none; color: inherit; }
 /* Font family helpers */
 .font-heading { font-family: var(--font-merriweather) !important; }
 .font-body    { font-family: var(--font-inter) !important; }
+/* Devanagari body text (Hindi summary pages); Latin words fall back to Inter */
+.font-hindi, .font-hindi h1, .font-hindi h2, .font-hindi h3 {
+  font-family: "Noto Sans Devanagari", var(--font-inter) !important;
+}
 
 /* Brand color helpers */
 .text-brand     { color: var(--brand-primary) !important; }

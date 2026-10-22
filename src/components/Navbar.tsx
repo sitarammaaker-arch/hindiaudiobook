@@ -37,6 +37,7 @@ export default function Navbar() {
             {[
               { href: "/", label: "Home" },
               { href: "/best", label: "Best Lists" },
+              { href: "/summary", label: "Summaries" },
               { href: "/authors", label: "Authors" },
               { href: "/chapters", label: "Chapters" },
             ].map((item) => (
@@ -100,6 +101,7 @@ export default function Navbar() {
           {[
             { href: "/",                    label: "🏠 Home" },
             { href: "/best",               label: "🏆 Best Lists" },
+            { href: "/summary",            label: "📖 Hindi Summaries" },
             { href: "/authors",            label: "✍️ Authors" },
             { href: "/chapters",           label: "📚 Chapter Books" },
             { href: "/free-hindi-audiobooks", label: "🆓 Free Audiobooks" },
