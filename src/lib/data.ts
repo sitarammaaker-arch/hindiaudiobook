@@ -49,19 +49,16 @@ export function isIndexable(book: Pick<Audiobook, "description">): boolean {
   return descriptionWordCount(book) >= MIN_INDEXABLE_WORDS;
 }
 
-// An author's books: listed in author.books, or matched by full name, or by
-// last name (e.g. "Douglas" matches "Mark Douglas").
+// "Dr. B.R. Ambedkar" → "dr b r ambedkar", so punctuation and case don't block a match
+const normName = (name: string) =>
+  name.replace(/^by\s+/i, "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+
+// An author's books: listed in author.books, or with the same full name.
+// (Matching on last name alone gave Robin Sharma all of Vishnu Sharma's kids'
+// stories and Immanuel Kant the Almanack of Naval Ravikant.)
 export function getBooksForAuthor(author: Author, allBooks: Audiobook[]): Audiobook[] {
-  const authorNameLower = author.name.toLowerCase();
-  const authorLastName = author.name.split(" ").pop()?.toLowerCase() || "";
-  return allBooks.filter((b) => {
-    const bookAuthor = b.author?.replace(/^by\s+/i, "").toLowerCase().trim() || "";
-    return (
-      author.books?.includes(b.slug) ||
-      bookAuthor === authorNameLower ||
-      (authorLastName.length > 3 && bookAuthor.includes(authorLastName))
-    );
-  });
+  const name = normName(author.name);
+  return allBooks.filter((b) => author.books?.includes(b.slug) || normName(b.author || "") === name);
 }
 
 // Authors added through the admin get a one-line template bio ("X ek popular
