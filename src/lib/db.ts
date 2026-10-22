@@ -53,13 +53,13 @@ const kvKey = (filename: string) => "ha:" + filename.replace(".json", "");
 // unstable_cache is Next.js's recommended way to cache a non-fetch / no-store
 // data source. This does NOT touch any page's rendering mode, so it cannot
 // conflict with static/ISR generation the way page-level `revalidate` did.
+// Errors are NOT caught here: unstable_cache only stores successful results,
+// so a failed Redis read can't get cached as an empty list for 60s.
 const getCachedRedisJSON = unstable_cache(
   async (filename: string): Promise<any[]> => {
-    try {
-      const redis = await getRedis();
-      const data = await redis.get<any[]>(kvKey(filename));
-      return data ?? [];
-    } catch { return []; }
+    const redis = await getRedis();
+    const data = await redis.get<any[]>(kvKey(filename));
+    return data ?? [];
   },
   ["ha-redis-json"],
   { revalidate: 60 }
@@ -68,7 +68,12 @@ const getCachedRedisJSON = unstable_cache(
 // ── Public async API ───────────────────────────────────────────────────────
 export async function readJSONAsync<T>(filename: string): Promise<T[]> {
   if (hasRedis()) {
-    return (await getCachedRedisJSON(filename)) as T[];
+    try {
+      return (await getCachedRedisJSON(filename)) as T[];
+    } catch (e) {
+      console.error(`[db] Redis read failed for ${filename}:`, e);
+      return [];
+    }
   }
   return readLocalJSON<T>(filename);
 }
