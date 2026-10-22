@@ -34,6 +34,12 @@ const nextConfig = {
         permanent: true,
       },
 
+      // ── Galat naam wale author pages → sahi naam wale ──────────
+      { source: "/author/jemes-allen", destination: "/author/james-allen", permanent: true },
+      { source: "/author/swett-marden", destination: "/author/orison-swett-marden", permanent: true },
+      { source: "/author/maharishi-tulsidas", destination: "/author/goswami-tulsidas", permanent: true },
+      { source: "/author/nicolo-machiavelli", destination: "/author/niccol-machiavelli", permanent: true },
+
       // ── Purani category pages → Nearest new category ───────────
       {
         source: "/category/share-market-trading",
