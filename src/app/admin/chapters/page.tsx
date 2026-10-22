@@ -339,7 +339,7 @@ export default function AdminChaptersPage() {
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Category</label>
                 <select value={newBook.category} onChange={e => setNewBook(p => ({ ...p, category: e.target.value }))}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-400">
-                  {[["trading-psychology","📈 Trading Psychology"],["wealth-finance","💰 Wealth & Finance"],["power-strategy","👑 Power & Strategy"],["story","📖 Story & Novel"],["self-help","🔥 Self Help"],["spiritual","🙏 Spiritual"],["kids","🧒 Kids Stories"]].map(([v,l]) => (
+                  {[["trading-psychology","📈 Trading Psychology"],["wealth-finance","💰 Wealth & Finance"],["power-strategy","👑 Power & Strategy"],["story","📖 Story & Novel"],["philosophy","🧠 Philosophy"],["science-history","🔭 Science & History"],["self-help","🔥 Self Help"],["spiritual","🙏 Spiritual"],["kids","🧒 Kids Stories"]].map(([v,l]) => (
                     <option key={v} value={v}>{l}</option>
                   ))}
                 </select>
